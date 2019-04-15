@@ -9,7 +9,7 @@ database = mysql.connector.connect(
 
 my_cursor = database.cursor()
 
-# my_cursor.execute("CREATE TABLE players (id INT PRIMARY KEY, name VARCHAR(40))")
+# my_cursor.execute("CREATE TABLE mmr (id VARCHAR(255) PRIMARY KEY, mmr INT)")
 
 # my_cursor.execute("SHOW TABLES")
 #
@@ -38,9 +38,33 @@ my_cursor = database.cursor()
 #
 # print(my_cursor.rowcount, "was inserted.")
 
-my_cursor.execute("SELECT * FROM players")
 
-myresult = my_cursor.fetchall()
+# my_cursor.execute("SELECT * FROM players")
+#
+# myresult = my_cursor.fetchall()
+#
+# for x in myresult:
+#     print(x)
 
-for x in myresult:
-    print(x)
+def get_players():
+    my_cursor.execute("SELECT * FROM players")
+    return my_cursor.fetchall()
+
+
+def add_player(val):
+    sql = "INSERT INTO players (id, name) VALUES (%s, %s)"
+    my_cursor.execute(sql, val)
+    database.commit()
+    print(my_cursor.rowcount, "record inserted.")
+
+
+def get_mmr():
+    sql = "SELECT \
+      id \
+      FROM players \
+      INNER JOIN mmr ON players.id = mmr.id"
+    my_cursor.execute(sql)
+    return my_cursor.fetchall()
+
+if __name__ == '__main__':
+    get_mmr()
