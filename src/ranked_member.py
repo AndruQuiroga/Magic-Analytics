@@ -55,10 +55,10 @@ class RankedMember:
 
 if __name__ == '__main__':
     p1 = RankedMember(2222, 1372)
-    p2 = RankedMember(3333, 1296)
+    p2 = RankedMember(3333, 1178)
 
     print(p2)
-    p2.lost(p1)
+    p2.win(p1)
     print(p2)
 
 

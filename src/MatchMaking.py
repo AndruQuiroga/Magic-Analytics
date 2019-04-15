@@ -1,6 +1,7 @@
 import random
 from src.ranked_member import RankedMember
 
+
 def pick(players):
     num = random.randint(0, 3)
     num2 = random.randint(0, 3)
@@ -12,7 +13,7 @@ def pick(players):
 if __name__ == '__main__':
 
     matched = []
-    current_players = [RankedMember(i, random.randint(900, 1200)) for i in range(20)]
+    current_players = [RankedMember(i, random.randint(700, 1400)) for i in range(40)]
     current_players.sort(reverse=True)
     matches = 0
 
@@ -46,7 +47,8 @@ if __name__ == '__main__':
         current_players.remove(current_players[-1])
         matches += 1
 
-    print(len(current_players))
+    for players in current_players:
+        print(players.mmr)
     print(matched)
     print(matches)
 
