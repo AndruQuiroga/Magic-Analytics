@@ -7,6 +7,7 @@ class RankedMember:
 
         self.id = id
         self.mmr = mmr
+        self.blacklist = []
 
     def __str__(self):
         return f"ID: {self.id} MMR: {self.mmr}"
@@ -41,6 +42,7 @@ class RankedMember:
         else:
             new_mmr = -diff // 8 + 20
             self.mmr += self.upper_clamp(new_mmr, 40)
+
 
     def upper_clamp(self, input, clamp):
         if input > clamp:
