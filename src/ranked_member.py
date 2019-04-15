@@ -3,14 +3,15 @@ import math
 
 class RankedMember:
 
-    def __init__(self, id=None, mmr=1000):
+    def __init__(self, name="", id=None, mmr=1000):
 
-        self.id = id
-        self.mmr = mmr
+        self.name = name
+        self.id = int(id)
+        self.mmr = int(mmr)
         self.blacklist = []
 
     def __str__(self):
-        return f"ID: {self.id} MMR: {self.mmr}"
+        return f"NAME: {self.name} ID: {self.id} MMR: {self.mmr}"
 
     def __eq__(self, other):
         if self.id == other.id:
@@ -33,6 +34,7 @@ class RankedMember:
         else:
             new_mmr = diff // 16 + 15
             self.mmr -= self.lower_clamp(new_mmr, 5)
+        print(self)
 
     def win(self, other):
         diff = self.mmr - other.mmr
@@ -42,6 +44,9 @@ class RankedMember:
         else:
             new_mmr = -diff // 8 + 20
             self.mmr += self.upper_clamp(new_mmr, 40)
+
+        other.lost(self)
+        print(self)
 
 
     def upper_clamp(self, input, clamp):

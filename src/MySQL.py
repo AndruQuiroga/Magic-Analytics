@@ -66,5 +66,6 @@ def get_mmr():
     my_cursor.execute(sql)
     return my_cursor.fetchall()
 
+
 if __name__ == '__main__':
     get_mmr()
