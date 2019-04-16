@@ -248,3 +248,4 @@ def stats():
 
 if __name__ == '__main__':
     pre_main()
+    input("Pause")

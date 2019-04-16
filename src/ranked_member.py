@@ -34,7 +34,7 @@ class RankedMember:
 
     def save(self):
         winloss = "{:03d}{:03d}".format(self.wins, self.losses)
-        update((self.mmr, winloss, self.id))
+        update((str(self.mmr), winloss, str(self.id)))
 
     def lost(self, other):
         print(f"----------\nBefore: {self}")

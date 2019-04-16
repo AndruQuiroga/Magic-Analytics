@@ -32,6 +32,8 @@ def match_make(current_players, round_number):
             bye = roster[random.randint(0, len(roster) - 1)]
         bye.bye = 1
         roster.remove(bye)
+    else:
+        bye = False
 
     while len(roster) >= 4:
         matched.append([])
