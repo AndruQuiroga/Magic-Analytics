@@ -28,8 +28,9 @@ def main():
         put = input(f"{spacer}Insert Command: ")
         put = put.lower()
 
-        if put == "list":
-            print(current_players[0])
+        if put == "list" or put == "ls":
+            for player in current_players:
+                print(player.name)
             continue
 
         if put == "matchmake" or put == "mm":
@@ -53,19 +54,19 @@ def main():
                 print("INCORRECT PASSWORD")
                 continue
 
-        if put == "add":
+        if put == "add" or put == "a":
             add()
             break
 
-        if put == "remove":
+        if put == "remove" or put == "r":
             remove()
             break
 
-        if put == "stats":
+        if put == "stats" or put == "s":
             stats()
             break
 
-        if put == "declare":
+        if put == "declare" or put == "d":
             declare()
 
         if put == "help" or put == "?":
@@ -166,7 +167,7 @@ def remove():
                 raise Exception
 
 
-def declare():
+def declare():  # @TODO Only one declare per round
 
     system("cls")
     global count

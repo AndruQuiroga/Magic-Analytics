@@ -37,8 +37,8 @@ class RankedMember:
         update((str(self.mmr), winloss, str(self.id)))
 
     def lost(self, other):
-        print(f"----------\nBefore: {self}")
         diff = self.mmr - other.mmr
+        bmmr = self.mmr
         if diff > 0:
             new_mmr = (diff // 8) + 15
             self.mmr -= self.upper_clamp(new_mmr, 30)
@@ -47,11 +47,11 @@ class RankedMember:
             self.mmr -= self.lower_clamp(new_mmr, 5)
         self.losses += 1
         self.save()
-        print(f"After: {self}\n----------")
+        print(f"==============================\n{self.name}\n{bmmr} ---> {self.mmr}")
 
     def win(self, other):
-        print(f"----------\nBefore: {self}")
         diff = self.mmr - other.mmr
+        bmmr = self.mmr
         if diff > 0:
             new_mmr = -diff // 16 + 20
             self.mmr += self.lower_clamp(new_mmr, 10)
@@ -60,7 +60,7 @@ class RankedMember:
             self.mmr += self.upper_clamp(new_mmr, 40)
         self.wins += 1
         self.save()
-        print(f"After: {self}")
+        print(f"==============================\n{self.name}\n{bmmr} ---> {self.mmr}")
         other.lost(self)
 
 

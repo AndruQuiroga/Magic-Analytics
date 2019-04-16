@@ -3,7 +3,7 @@ import random
 import names
 from ranked_member import RankedMember
 
-test_players = [RankedMember(name=names.get_first_name(), id=i, mmr=random.randint(700, 1400), winloss='001002') for i in range(9)]
+test_players = [RankedMember(name=names.get_first_name(), id=i, mmr=random.randint(700, 1400), winloss='001002') for i in range(18)]
 
 
 def pick(players):
