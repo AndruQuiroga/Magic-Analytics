@@ -1,5 +1,4 @@
 import datetime
-import msvcrt
 from os import system
 from MatchMaking import match_make
 from MySQL import *
@@ -195,19 +194,26 @@ def declare():  # @TODO Only one declare per round
                     answer = input(f"{spacer}looking for {player.name}? ")
                     answer.lower()
 
-                tmp = input(f"Are you sure you want {player.name}? ")
-                tmp = tmp.lower()
-                if tmp in "yes":
-                    for i, x in enumerate(matched[count][0]):
-                        if player in x:
-                            win = x.index(player)
-                            if win == 1:
-                                lost = 0
-                            else:
-                                lost = 1
-                            loser = matched[count][0][i][lost]
-                            print(f"{spacer}{player.name} beat {loser.name}!!")
-                            player.win(loser)
+                if player.declared == 1:
+                    print(f"{spacer}{player.name} already won this round!!")
+                    continue
+                if player.declared == -1:
+                    print(f"{spacer}{player.name} already lost this round!!")
+                    continue
+                else:
+                    tmp = input(f"Are you sure you want {player.name}? ")
+                    tmp = tmp.lower()
+                    if tmp in "yes":
+                        for i, x in enumerate(matched[count][0]):
+                            if player in x:
+                                win = x.index(player)
+                                if win == 1:
+                                    lost = 0
+                                else:
+                                    lost = 1
+                                loser = matched[count][0][i][lost]
+                                print(f"{spacer}{player.name} beat {loser.name}!!")
+                                player.win(loser)
 
             except StopIteration:
                 print(f"{spacer}No more players by the Keyword {name}!")

@@ -3,7 +3,7 @@ import random
 import names
 from ranked_member import RankedMember
 
-test_players = [RankedMember(name=names.get_first_name(), id=i, mmr=random.randint(700, 1400), winloss='001002') for i in range(18)]
+test_players = [RankedMember(name=names.get_first_name(), id=i, mmr=random.randint(700, 1400), winloss='000000') for i in range(18)]
 
 
 def pick(players):
@@ -20,6 +20,8 @@ def pick(players):
 def match_make(current_players, round_number):
 
     matched = []
+    for player in current_players:
+        player.declared = 0
     roster = copy.deepcopy(current_players)
     roster += test_players
     roster.sort(reverse=True)

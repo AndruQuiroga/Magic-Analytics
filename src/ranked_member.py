@@ -3,6 +3,18 @@ import math
 from MySQL import update
 
 
+def upper_clamp(input, clamp):
+    if input > clamp:
+        return clamp
+    return input
+
+
+def lower_clamp(input, clamp):
+    if input < clamp:
+        return clamp
+    return input
+
+
 class RankedMember:
 
     def __init__(self, name="", id=None, mmr=1000, winloss='000000', created=None):
@@ -13,6 +25,7 @@ class RankedMember:
         self.wins = int(winloss[:3])
         self.losses = int(winloss[3:])
         self.created = created
+        self.declared = 0
         self.bye = 0
         self.blacklist = []
 
@@ -41,11 +54,12 @@ class RankedMember:
         bmmr = self.mmr
         if diff > 0:
             new_mmr = (diff // 8) + 15
-            self.mmr -= self.upper_clamp(new_mmr, 30)
+            self.mmr -= upper_clamp(new_mmr, 30)
         else:
             new_mmr = diff // 16 + 15
-            self.mmr -= self.lower_clamp(new_mmr, 5)
+            self.mmr -= lower_clamp(new_mmr, 5)
         self.losses += 1
+        self.declared = -1
         self.save()
         print(f"==============================\n{self.name}\n{bmmr} ---> {self.mmr}")
 
@@ -54,35 +68,12 @@ class RankedMember:
         bmmr = self.mmr
         if diff > 0:
             new_mmr = -diff // 16 + 20
-            self.mmr += self.lower_clamp(new_mmr, 10)
+            self.mmr += lower_clamp(new_mmr, 10)
         else:
             new_mmr = -diff // 8 + 20
-            self.mmr += self.upper_clamp(new_mmr, 40)
+            self.mmr += upper_clamp(new_mmr, 40)
         self.wins += 1
+        self.declared = 1
         self.save()
         print(f"==============================\n{self.name}\n{bmmr} ---> {self.mmr}")
         other.lost(self)
-
-
-
-    def upper_clamp(self, input, clamp):
-        if input > clamp:
-            return clamp
-        return input
-
-    def lower_clamp(self, input, clamp):
-        if input < clamp:
-            return clamp
-        return input
-
-
-if __name__ == '__main__':
-    p1 = RankedMember(2222, 1372)
-    p2 = RankedMember(3333, 1178)
-
-    print(p2)
-    p2.win(p1)
-    print(p2)
-
-
-

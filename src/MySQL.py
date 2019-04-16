@@ -1,10 +1,20 @@
+import zipfile
+
 import mysql.connector
+import time
+import os
+
+host = "overtimegaming.us.to"
+username = "dreski"
+password = "imidnightsnack15"
+data = "magic_players"
+
 
 database = mysql.connector.connect(
-  host="localhost",
-  user="Dreski",
-  passwd="imidnightsnack15",
-  database="mydatabase"
+  host=f"{host}",
+  user=f"{username}",
+  passwd=f"{password}",
+  database=f"{data}"
 )
 
 my_cursor = database.cursor()
@@ -15,27 +25,7 @@ my_cursor = database.cursor()
 # for x in my_cursor:
 #   print(x)
 
-#
-# sql = "INSERT INTO players (id, name) VALUES (%s, %s)"
-# val = [
-#   ('00961715', 'Peter'),
-#   ('00961845', 'Amy '),
-#   ('00961145', 'Hannah'),
-#   ('00967742', 'Michael'),
-#   ('00962135', 'Sandy'),
-#   ('00965588', 'Betty'),
-#   ('00969845', 'Richard'),
-#   ('00968452', 'Susan'),
-#   ('00961254', 'Vicky'),
-#   ('00961534', 'Ben'),
-#   ('00968895', 'William'),
-# ]
-#
-# my_cursor.executemany(sql, val)
-#
-# database.commit()
-#
-# print(my_cursor.rowcount, "was inserted.")
+# my_cursor.execute("CREATE DATABASE magic_players")
 
 
 # my_cursor.execute("SELECT * FROM players")
@@ -46,6 +36,17 @@ my_cursor = database.cursor()
 #     print(x)
 
 # my_cursor.execute("ALTER TABLE players ADD COLUMN mmr INT")
+
+
+def first_time():
+    print("Creating new Database...")
+    my_cursor.execute("CREATE TABLE players \
+                          (id VARCHAR(255) PRIMARY KEY, \
+                          name VARCHAR(40), \
+                          mmr INT, \
+                          winloss VARCHAR(20), \
+                          created VARCHAR(40))")
+    print("DONE!")
 
 
 def get_players():
@@ -66,6 +67,16 @@ def update(val):
     database.commit()
 
 
+def backup():
+
+    filestamp = time.strftime('%Y-%m-%d-%I-%M')
+    os.popen(f"mysqldump --all-databases -u {username} -p{password} -c -h {host} > {data}_{filestamp}.sql")
+
+    os.system("mkdir " + filestamp)
+    zipf = zipfile.ZipFile(os.path.join(filestamp, f'{data}.zip'), 'w', zipfile.ZIP_DEFLATED)
+    zipf.write(f'{data}_{filestamp}.sql')
+    zipf.close()
+
 def delete():
     print("Deleting Database...")
     my_cursor.execute("DROP TABLE players")
@@ -80,4 +91,5 @@ def delete():
 
 
 if __name__ == '__main__':
+    backup()
     pass
