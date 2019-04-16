@@ -9,7 +9,6 @@ database = mysql.connector.connect(
 
 my_cursor = database.cursor()
 
-# my_cursor.execute("CREATE TABLE mmr (id VARCHAR(255) PRIMARY KEY, mmr INT)")
 
 # my_cursor.execute("SHOW TABLES")
 #
@@ -46,26 +45,39 @@ my_cursor = database.cursor()
 # for x in myresult:
 #     print(x)
 
+# my_cursor.execute("ALTER TABLE players ADD COLUMN mmr INT")
+
+
 def get_players():
     my_cursor.execute("SELECT * FROM players")
     return my_cursor.fetchall()
 
 
 def add_player(val):
-    sql = "INSERT INTO players (id, name) VALUES (%s, %s)"
+    sql = "INSERT INTO players (id, name, mmr, winloss, created) VALUES (%s, %s, %s, %s, %s)"
     my_cursor.execute(sql, val)
     database.commit()
-    print(my_cursor.rowcount, "record inserted.")
+    print(my_cursor.rowcount, "record inserted.", val[1])
 
 
-def get_mmr():
-    sql = "SELECT \
-      id \
-      FROM players \
-      INNER JOIN mmr ON players.id = mmr.id"
-    my_cursor.execute(sql)
-    return my_cursor.fetchall()
+def update(val):
+    sql = "UPDATE players SET mmr = %s, winloss = %s WHERE id = %s"
+    my_cursor.execute(sql, val)
+    database.commit()
+
+
+def delete():
+    print("Deleting Database...")
+    my_cursor.execute("DROP TABLE players")
+    print("Creating new Database...")
+    my_cursor.execute("CREATE TABLE players \
+                      (id VARCHAR(255) PRIMARY KEY, \
+                      name VARCHAR(40), \
+                      mmr INT, \
+                      winloss VARCHAR(20), \
+                      created VARCHAR(40))")
+    print("DONE!")
 
 
 if __name__ == '__main__':
-    get_mmr()
+    pass

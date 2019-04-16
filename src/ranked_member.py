@@ -1,17 +1,23 @@
 import math
 
+from MySQL import update
+
 
 class RankedMember:
 
-    def __init__(self, name="", id=None, mmr=1000):
+    def __init__(self, name="", id=None, mmr=1000, winloss='000000', created=None):
 
         self.name = name
         self.id = int(id)
         self.mmr = int(mmr)
+        self.wins = int(winloss[:3])
+        self.losses = int(winloss[3:])
+        self.created = created
+        self.bye = 0
         self.blacklist = []
 
     def __str__(self):
-        return f"NAME: {self.name} ID: {self.id} MMR: {self.mmr}"
+        return f"NAME: {self.name}\nID: {self.id}\nMMR: {self.mmr}\nW/L: {self.wins}:{self.losses}\nCreated: {self.created}"
 
     def __eq__(self, other):
         if self.id == other.id:
@@ -26,7 +32,12 @@ class RankedMember:
     def __lt__(self, other):
         return not self.__gt__(other)
 
+    def save(self):
+        winloss = "{:03d}{:03d}".format(self.wins, self.losses)
+        update((self.mmr, winloss, self.id))
+
     def lost(self, other):
+        print(f"----------\nBefore: {self}")
         diff = self.mmr - other.mmr
         if diff > 0:
             new_mmr = (diff // 8) + 15
@@ -34,9 +45,12 @@ class RankedMember:
         else:
             new_mmr = diff // 16 + 15
             self.mmr -= self.lower_clamp(new_mmr, 5)
-        print(self)
+        self.losses += 1
+        self.save()
+        print(f"After: {self}\n----------")
 
     def win(self, other):
+        print(f"----------\nBefore: {self}")
         diff = self.mmr - other.mmr
         if diff > 0:
             new_mmr = -diff // 16 + 20
@@ -44,9 +58,11 @@ class RankedMember:
         else:
             new_mmr = -diff // 8 + 20
             self.mmr += self.upper_clamp(new_mmr, 40)
-
+        self.wins += 1
+        self.save()
+        print(f"After: {self}")
         other.lost(self)
-        print(self)
+
 
 
     def upper_clamp(self, input, clamp):

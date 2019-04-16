@@ -1,5 +1,9 @@
+import copy
 import random
-from src.ranked_member import RankedMember
+import names
+from ranked_member import RankedMember
+
+test_players = [RankedMember(name=names.get_first_name(), id=i, mmr=random.randint(700, 1400), winloss='001002') for i in range(9)]
 
 
 def pick(players):
@@ -13,55 +17,67 @@ def pick(players):
     return players[num1], players[num2]
 
 
-if __name__ == '__main__':
+def match_make(current_players, round_number):
 
     matched = []
-    current_players = [RankedMember(i, random.randint(700, 1400)) for i in range(10)]
-    current_players.sort(reverse=True)
+    roster = copy.deepcopy(current_players)
+    roster += test_players
+    roster.sort(reverse=True)
     matches = 0
 
-    for players in current_players:
-        current_players[0].blacklist.append(players)
-    print(current_players[0].blacklist)
+    if len(roster) % 2 == 1:
+        bye = roster[random.randint(0, len(roster)-1)]
+        while bye.bye == 1:
+            print("Bye Blacklist!")
+            bye = roster[random.randint(0, len(roster) - 1)]
+        bye.bye = 1
+        roster.remove(bye)
 
-    while len(current_players) >= 4:
+    while len(roster) >= 4:
         matched.append([])
-        picks = pick(current_players[0:4])
+        picks = pick(roster[0:4])
+        picks[0].blacklist = []
+        picks[1].blacklist = []
         picks[0].blacklist.append(picks[1])
         picks[1].blacklist.append(picks[0])
-        current_players.remove(picks[0])
-        current_players.remove(picks[1])
-        matched[matches].append(picks[0].mmr)
-        matched[matches].append(picks[1].mmr)
+        roster.remove(picks[0])
+        roster.remove(picks[1])
+        matched[matches].append(picks[0])
+        matched[matches].append(picks[1])
         matches += 1
 
-    if len(current_players) == 3:
+    if len(roster) == 3:
 
         matched.append([])
         num = random.randint(0, 2)
         num2 = random.randint(0, 2)
         while num2 == num:
             num2 = random.randint(0, 2)
-        matched[matches].append(current_players[num].mmr)
-        matched[matches].append(current_players[num2].mmr)
-        current_players.remove(current_players[num])
-        current_players.remove(current_players[num2])
+        matched[matches].append(roster[num])
+        matched[matches].append(roster[num2])
+        roster.remove(matched[matches][0])
+        roster.remove(matched[matches][1])
         matches += 1
 
-    if len(current_players) == 2:
+    if len(roster) == 2:
         matched.append([])
-        matched[matches].append(current_players[0].mmr)
-        matched[matches].append(current_players[1].mmr)
-        current_players.remove(current_players[-1])
-        current_players.remove(current_players[-1])
+        matched[matches].append(roster[0])
+        matched[matches].append(roster[1])
+        roster[0].blacklist.append(roster[1])
+        roster[1].blacklist.append(roster[0])
+        roster.remove(roster[-1])
+        roster.remove(roster[-1])
         matches += 1
 
-    for players in current_players:
-        print("By: " + players.mmr)
-    print(matched)
-    print(matches)
+    with open(f"Round{round_number+1}.txt", "w") as file:
+        for match in matched:
+            file.write(f"{match[0].name} ({match[0].mmr}) vs {match[1].name} ({match[1].mmr})\n")
+        if bye:
+            print(str(bye))
+            file.write(f"Bye: {bye.name}")
+    file.close()
 
-
+    return matched
 
 
 
