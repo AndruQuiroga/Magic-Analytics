@@ -1,8 +1,16 @@
 import datetime
 from os import system
+from os import name as n
 from MatchMaking import match_make
 from MySQL import *
 from ranked_member import RankedMember
+
+
+def clear():
+    if n == 'nt':
+        system('cls')
+    else:
+        system('clear')
 
 
 def pre_main():
@@ -16,18 +24,22 @@ def pre_main():
     current_players = []
     matched = []
     count = -1
+    print(registered)
+    print("Pre-main done!")
     main()
 
 
 def main():
-
-    system("cls")
+    clear()
     while True:
 
         put = input(f"{spacer}Insert Command: ")
         put = put.lower()
 
         if put == "list" or put == "ls":
+            if current_players == []:
+                print("list is empty!")
+                continue
             for player in current_players:
                 print(player.name)
             continue
@@ -83,7 +95,7 @@ def main():
 
 def add():
 
-    system("cls")
+    clear()
     global current_players
     while True:
 
@@ -102,10 +114,8 @@ def add():
                 if not any(scan_id in player for player in registered):
                     print(f"{spacer}ID not found in database!")
                     tmp = input("Want to to create a new Account? ")
-                    if tmp.lower() in "yes":
-                        name = input("Create an Account name: ")
-                    else:
-                        continue
+                    name = input("Create an Account name: ")
+                    from src.MySQL import add_player
                     add_player((scan_id, name, 1000, '000000', datetime.date.today()))
                     current_players.append(RankedMember(name=name, id=scan_id, created=datetime.date.today()))
                     print(f"{spacer}Account \'{current_players[-1].name}\' Created!")
@@ -127,7 +137,7 @@ def add():
 
 def remove():
 
-    system("cls")
+    clear()
     global current_players
     while True:
         name = input(f"{spacer}Enter name you wish to remove from roster: ")
@@ -168,7 +178,7 @@ def remove():
 
 def declare():  # @TODO Only one declare per round
 
-    system("cls")
+    clear()
     global count
     while True:
         name = input(f"{spacer}Enter name you wish to search from roster: ")
@@ -225,7 +235,7 @@ def declare():  # @TODO Only one declare per round
 
 def stats():
 
-    system("cls")
+    clear()
     while True:
         scan_id = input(f"{spacer}\nSwipe Card    ID:")
 

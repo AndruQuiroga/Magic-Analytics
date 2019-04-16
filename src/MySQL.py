@@ -1,5 +1,4 @@
 import zipfile
-
 import mysql.connector
 import time
 import os
@@ -18,6 +17,7 @@ database = mysql.connector.connect(
 )
 
 my_cursor = database.cursor()
+
 
 
 # my_cursor.execute("SHOW TABLES")
@@ -77,6 +77,7 @@ def backup():
     zipf.write(f'{data}_{filestamp}.sql')
     zipf.close()
 
+
 def delete():
     print("Deleting Database...")
     my_cursor.execute("DROP TABLE players")
@@ -91,5 +92,4 @@ def delete():
 
 
 if __name__ == '__main__':
-    backup()
     pass
