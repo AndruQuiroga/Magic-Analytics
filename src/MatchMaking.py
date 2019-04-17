@@ -3,7 +3,7 @@ import random
 import names
 import os
 import datetime
-from ranked_member import RankedMember
+from src.ranked_member import RankedMember
 
 test_players = [RankedMember(name=names.get_first_name(), id=i, mmr=random.randint(700, 1400), winloss='000000') for i in range(18)]
 
@@ -50,19 +50,6 @@ def match_make(current_players, round_number):
         roster.remove(picks[1])
         matched[matches].append(picks[0])
         matched[matches].append(picks[1])
-        matches += 1
-
-    if len(roster) == 3:
-
-        matched.append([])
-        num = random.randint(0, 2)
-        num2 = random.randint(0, 2)
-        while num2 == num:
-            num2 = random.randint(0, 2)
-        matched[matches].append(roster[num])
-        matched[matches].append(roster[num2])
-        roster.remove(matched[matches][0])
-        roster.remove(matched[matches][1])
         matches += 1
 
     if len(roster) == 2:

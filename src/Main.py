@@ -1,9 +1,9 @@
 import datetime
 from os import system
 from os import name as n
-from MatchMaking import match_make
-from MySQL import *
-from ranked_member import RankedMember
+from src.MatchMaking import match_make
+from src.MySQL import *
+from src.ranked_member import RankedMember
 
 
 def clear():
@@ -176,7 +176,7 @@ def remove():
                 raise Exception
 
 
-def declare():  # @TODO Only one declare per round
+def declare():
 
     clear()
     global count
@@ -184,7 +184,7 @@ def declare():  # @TODO Only one declare per round
         name = input(f"{spacer}Enter name you wish to search from roster: ")
         name = name.lower()
 
-        if name == "exit":
+        if name == "x":
             main()
             break
 
@@ -265,4 +265,3 @@ def stats():
 
 if __name__ == '__main__':
     pre_main()
-    input("Pause")

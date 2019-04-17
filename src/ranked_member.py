@@ -1,6 +1,6 @@
 import math
 
-from MySQL import update
+from src.MySQL import update
 
 
 def upper_clamp(input, clamp):
