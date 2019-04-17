@@ -1,8 +1,10 @@
 import datetime
+import random
 from os import system
 from os import name as n
-from src.MatchMaking import match_make
+import names
 from src.MySQL import *
+from src.match import Match
 from src.ranked_member import RankedMember
 
 
@@ -13,18 +15,40 @@ def clear():
         system('clear')
 
 
+def reorder():
+    registered_players.sort(reverse=True)
+    for rank, player in enumerate(registered_players):
+        player.rank_num = rank+1
+
+
 def pre_main():
-    global registered  # @todo make objects for all
+    global registered_players
     global current_players
     global matched
     global count
     global spacer
+    global current_match
     spacer = "==============================\n"
-    registered = get_players()
+
+    test_players = [RankedMember(name=names.get_first_name(), id=i, mmr=random.randint(700, 1400), winloss='000000') for
+                    i in range(18)]
+
+    registered_players = []
+    for player in get_players():
+        registered_players.append(
+            RankedMember(id=player[0],
+                         name=player[1],
+                         mmr=player[2],
+                         winloss=player[3],
+                         created=player[4]))
+
+    reorder()
     current_players = []
+    current_players += test_players
+    current_match = Match([], 0)
     matched = []
-    count = -1
-    print(registered)
+    count = 0
+    print(registered_players)
     print("Pre-main done!")
     main()
 
@@ -37,7 +61,7 @@ def main():
         put = put.lower()
 
         if put == "list" or put == "ls":
-            if current_players == []:
+            if not current_players:
                 print("list is empty!")
                 continue
             for player in current_players:
@@ -45,11 +69,15 @@ def main():
             continue
 
         if put == "matchmake" or put == "mm":
-            global count
-            count += 1
-            matched.append([])
-            matched[count].append(match_make(current_players, count))
-            continue
+            global current_match
+            if current_match.num_matches != 0:
+                if input("Not all matches have been concluded! ") == "force":
+                    current_match = Match(current_players, current_match.round_number+1)
+                else:
+                    continue
+            else:
+                current_match = Match(current_players, current_match.round_number + 1)
+                continue
 
         if put == "reset":
             pre_main()
@@ -111,26 +139,20 @@ def add():
                 print(f"{spacer}Current Players: {len(current_players)}!")
 
             else:
-                if not any(scan_id in player for player in registered):
+                if not any(int(scan_id) == player.id for player in registered_players):
                     print(f"{spacer}ID not found in database!")
                     tmp = input("Want to to create a new Account? ")
                     name = input("Create an Account name: ")
-                    from src.MySQL import add_player
                     add_player((scan_id, name, 1000, '000000', datetime.date.today()))
                     current_players.append(RankedMember(name=name, id=scan_id, created=datetime.date.today()))
                     print(f"{spacer}Account \'{current_players[-1].name}\' Created!")
                 else:
-                    for i, x in enumerate(registered):
-                        if scan_id in x:
-                            print(f"{spacer}Welcome {registered[i][1]}!")
-                            print(f"{registered[i][1]} added to the current Roster")
+                    for player in registered_players:
+                        if int(scan_id) == player.id:
+                            print(f"{spacer}Welcome {player.name}!")
+                            print(f"{player.name} added to the current Roster")
+                            current_players.append(player)
                             print(f"{spacer}Current Players: {len(current_players)}!")
-                            current_players.append(
-                                RankedMember(id=registered[i][0],
-                                             name=registered[i][1],
-                                             mmr=registered[i][2],
-                                             winloss=registered[i][3],
-                                             created=registered[i][4]))
         except ValueError as e:
             print("Invalid Command: " + e.__str__())
 
@@ -179,7 +201,6 @@ def remove():
 def declare():
 
     clear()
-    global count
     while True:
         name = input(f"{spacer}Enter name you wish to search from roster: ")
         name = name.lower()
@@ -204,6 +225,8 @@ def declare():
                     answer = input(f"{spacer}looking for {player.name}? ")
                     answer.lower()
 
+                print(player.declared)
+
                 if player.declared == 1:
                     print(f"{spacer}{player.name} already won this round!!")
                     continue
@@ -214,16 +237,13 @@ def declare():
                     tmp = input(f"Are you sure you want {player.name}? ")
                     tmp = tmp.lower()
                     if tmp in "yes":
-                        for i, x in enumerate(matched[count][0]):
-                            if player in x:
-                                win = x.index(player)
-                                if win == 1:
-                                    lost = 0
-                                else:
-                                    lost = 1
-                                loser = matched[count][0][i][lost]
+                        for match in current_match.matches:
+                            if player in match:
+                                match.remove(player)
+                                loser = match[0]
                                 print(f"{spacer}{player.name} beat {loser.name}!!")
                                 player.win(loser)
+                                current_match.matches.remove(match)
 
             except StopIteration:
                 print(f"{spacer}No more players by the Keyword {name}!")
@@ -244,24 +264,17 @@ def stats():
             break
 
         try:
-            count = 0
-            for i, x in enumerate(registered):
-                if scan_id in x:
-                    tmp = RankedMember(id=registered[i][0],
-                                 name=registered[i][1],
-                                 mmr=registered[i][2],
-                                 winloss=registered[i][3],
-                                 created=registered[i][4])
-                    print(f"{spacer}{str(tmp)}")
-                    count = 1
+            found = False
+            for player in registered_players:
+                if int(scan_id) == player.id:
+                    print(f"{spacer}{str(player)}")
+                    found = True
 
-            if count == 0:
+            if not found:
                 print(f"{spacer}Account not found!")
 
         except ValueError:
             print("Invalid Command!")
-
-
 
 if __name__ == '__main__':
     pre_main()

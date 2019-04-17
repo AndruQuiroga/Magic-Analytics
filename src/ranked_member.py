@@ -1,5 +1,3 @@
-import math
-
 from src.MySQL import update
 
 ranked_dict = {
@@ -37,12 +35,13 @@ class RankedMember:
         for key in ranked_dict:
             if self.mmr in key:
                 self.rank = ranked_dict[key]
+        self.rank_num = 999
         self.declared = 0
         self.bye = 0
         self.blacklist = []
 
     def __str__(self):
-        return f"NAME: {self.name}\nID: {self.id}\nRank: {self.rank}\nW/L: {self.wins}:{self.losses}\nCreated: {self.created}"  # @todo add rank number
+        return f"NAME: {self.name}\nID: {self.id}\nRank: {self.rank} : {self.rank_num}\nW/L: {self.wins}:{self.losses}\nCreated: {self.created}"
 
     def __eq__(self, other):
         if self.id == other.id:

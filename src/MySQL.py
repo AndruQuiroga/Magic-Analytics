@@ -54,6 +54,8 @@ def get_players():
     return my_cursor.fetchall()
 
 
+
+
 def add_player(val):
     sql = "INSERT INTO players (id, name, mmr, winloss, created) VALUES (%s, %s, %s, %s, %s)"
     my_cursor.execute(sql, val)
