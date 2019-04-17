@@ -2,6 +2,14 @@ import math
 
 from src.MySQL import update
 
+ranked_dict = {
+    range(1, 900): "Bronze",
+    range(900, 1050): "Silver",
+    range(1050, 1100): "Gold",
+    range(1100, 1150): "Platinum",
+    range(1150, 1200): "Diamond",
+    range(1200, 1800): "Mythic",
+}
 
 def upper_clamp(input, clamp):
     if input > clamp:
@@ -25,12 +33,16 @@ class RankedMember:
         self.wins = int(winloss[:3])
         self.losses = int(winloss[3:])
         self.created = created
+
+        for key in ranked_dict:
+            if self.mmr in key:
+                self.rank = ranked_dict[key]
         self.declared = 0
         self.bye = 0
         self.blacklist = []
 
     def __str__(self):
-        return f"NAME: {self.name}\nID: {self.id}\nMMR: {self.mmr}\nW/L: {self.wins}:{self.losses}\nCreated: {self.created}"
+        return f"NAME: {self.name}\nID: {self.id}\nRank: {self.rank}\nW/L: {self.wins}:{self.losses}\nCreated: {self.created}"  # @todo add rank number
 
     def __eq__(self, other):
         if self.id == other.id:

@@ -14,7 +14,7 @@ def clear():
 
 
 def pre_main():
-    global registered
+    global registered  # @todo make objects for all
     global current_players
     global matched
     global count
