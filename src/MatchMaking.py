@@ -1,6 +1,8 @@
 import copy
 import random
 import names
+import os
+import datetime
 from ranked_member import RankedMember
 
 test_players = [RankedMember(name=names.get_first_name(), id=i, mmr=random.randint(700, 1400), winloss='000000') for i in range(18)]
@@ -73,12 +75,21 @@ def match_make(current_players, round_number):
         roster.remove(roster[-1])
         matches += 1
 
-    with open(f"Round{round_number+1}.txt", "w") as file:
+    if not os.path.exists(str(datetime.date.today())):
+        os.system("mkdir " + str(datetime.date.today()))
+    with open(os.path.join(str(datetime.date.today()), f"Round{round_number+1}.txt"), "w") as file:
+        matched.sort()
         for match in matched:
-            file.write(f"{match[0].name} ({match[0].mmr}) vs {match[1].name} ({match[1].mmr})\n")
+            file.write(f"{match[0].name:16} ({match[0].mmr:04d}) vs {match[1].name:16} ({match[1].mmr:04d})\n")
+        file.write(f"==================================================\n")
+        for match in matched:
+            file.write(f"{match[1].name:16} ({match[1].mmr:04d}) vs {match[0].name:16} ({match[0].mmr:04d})\n")
+
         if bye:
             print(str(bye))
-            file.write(f"Bye: {bye.name}")
+            file.write(f"\nBye: {bye.name}")
+
+
     file.close()
 
     return matched
