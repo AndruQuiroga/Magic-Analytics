@@ -1,4 +1,5 @@
 import datetime
+import pickle
 import random
 from os import system
 from os import name as n
@@ -55,6 +56,8 @@ def pre_main():
 
 def main():
     clear()
+    global current_match
+
     while True:
 
         put = input(f"{spacer}Insert Command: ")
@@ -68,8 +71,10 @@ def main():
                 print(player.name)
             continue
 
+        if put == "debug":
+            print(len(current_match.matches))
+
         if put == "matchmake" or put == "mm":
-            global current_match
             if current_match.num_matches != 0:
                 if input("Not all matches have been concluded! ") == "force":
                     current_match = Match(current_players, current_match.round_number+1)
@@ -107,6 +112,11 @@ def main():
 
         if put == "declare" or put == "d":
             declare()
+
+        if put == "load":
+            file = open(os.path.join(str(datetime.date.today()), f"round{input('Round #: ')}.obj"), 'rb')
+            current_match = pickle.load(file)
+            continue
 
         if put == "help" or put == "?":
             print(f"{spacer}Valid Commands:"
@@ -237,13 +247,18 @@ def declare():
                     tmp = input(f"Are you sure you want {player.name}? ")
                     tmp = tmp.lower()
                     if tmp in "yes":
+                        found_player = 0
                         for match in current_match.matches:
                             if player in match:
+                                found_player = 1
                                 match.remove(player)
                                 loser = match[0]
                                 print(f"{spacer}{player.name} beat {loser.name}!!")
                                 player.win(loser)
                                 current_match.matches.remove(match)
+                                current_match.save_round()
+                        if found_player == 0:  # todo ranked objects do not retain self.declared
+                            print("Could not find player in current match!")
 
             except StopIteration:
                 print(f"{spacer}No more players by the Keyword {name}!")

@@ -1,4 +1,4 @@
-import copy
+import pickle
 import datetime
 import os
 import random
@@ -34,6 +34,7 @@ class Match:
         self.pick_bye()
         self.pick_matches()
         self.export_round()
+        self.save_round()
 
     def pick_bye(self):
         if len(self.roster) % 2 == 1:
@@ -81,3 +82,9 @@ class Match:
 
             if self.bye:
                 file.write(f"\nBye: {self.bye.name}")
+
+    def save_round(self):
+
+        file = open(os.path.join(str(datetime.date.today()), f'round{self.round_number}.obj'), 'wb')
+        pickle.dump(self, file)
+        file.close()
