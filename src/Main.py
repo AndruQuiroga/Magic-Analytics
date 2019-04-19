@@ -35,6 +35,7 @@ def pre_main():
                     i in range(18)]
 
     registered_players = []
+    registered_players += test_players
     for player in get_players():
         registered_players.append(
             RankedMember(id=player[0],

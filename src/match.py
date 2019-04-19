@@ -75,10 +75,10 @@ class Match:
         with open(os.path.join(str(datetime.date.today()), f"Round{self.round_number}.txt"), "w") as file:
             self.matches.sort()
             for match in self.matches:
-                file.write(f"{match[0].name:16} ({match[0].mmr:04d}) vs {match[1].name:16} ({match[1].mmr:04d})\n")
-            file.write(f"==================================================\n")
+                file.write(f"{match[0].name:16} ({match[0].rank:8} #{match[0].rank_num:03d}) vs {match[1].name:16} ({match[1].rank:8} #{match[1].rank_num:03d})\n")
+            file.write(f"====================================================================\n")
             for match in self.matches:
-                file.write(f"{match[1].name:16} ({match[1].mmr:04d}) vs {match[0].name:16} ({match[0].mmr:04d})\n")
+                file.write(f"{match[1].name:16} ({match[1].rank:8} #{match[1].rank_num:03d}) vs {match[0].name:16} ({match[0].rank:8} #{match[0].rank_num:03d})\n")
 
             if self.bye:
                 file.write(f"\nBye: {self.bye.name}")
