@@ -1,4 +1,4 @@
-from src.MySQL import update
+from bin.MySQL import update
 
 ranked_dict = {
     range(1, 900): "Bronze",
@@ -8,6 +8,7 @@ ranked_dict = {
     range(1150, 1200): "Diamond",
     range(1200, 1800): "Mythic",
 }
+
 
 def upper_clamp(input, clamp):
     if input > clamp:

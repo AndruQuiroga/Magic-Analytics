@@ -1,4 +1,4 @@
-from src import Main
+from bin import main_menu
 
 if __name__ == '__main__':
-    Main.pre_main()
+    main_menu.pre_main()

@@ -4,9 +4,9 @@ import random
 from os import system
 from os import name as n
 import names
-from src.MySQL import *
-from src.match import Match
-from src.ranked_member import RankedMember
+from bin.MySQL import *
+from bin.match import Match
+from bin.ranked_member import RankedMember
 
 
 def clear():
@@ -26,7 +26,6 @@ def pre_main():
     global registered_players
     global current_players
     global matched
-    global count
     global spacer
     global current_match
     spacer = "==============================\n"
@@ -47,15 +46,13 @@ def pre_main():
     reorder()
     current_players = []
     current_players += test_players
-    current_match = Match([], 0)
+    current_match = Match([],0)
     matched = []
-    count = 0
-    print(registered_players)
     print("Pre-main done!")
-    main()
+    main_menu()
 
 
-def main():
+def main_menu():
     clear()
     global current_match
 
@@ -75,7 +72,7 @@ def main():
         if put == "debug":
             print(len(current_match.matches))
 
-        if put == "matchmake" or put == "mm":
+        if put in ("matchmake", "mm"):
             if current_match.num_matches != 0:
                 if input("Not all matches have been concluded! ") == "force":
                     current_match = Match(current_players, current_match.round_number+1)
@@ -141,7 +138,7 @@ def add():
         scan_id = input(f"{spacer}\nSwipe Card    ID:")
 
         if scan_id.lower() == "x":
-            main()
+            main_menu()
             break
 
         try:
@@ -177,7 +174,7 @@ def remove():
         name = name.lower()
 
         if name == "x":
-            main()
+            main_menu()
             break
 
         if not any(name in player.name.lower() for player in current_players):
@@ -212,12 +209,16 @@ def remove():
 def declare():
 
     clear()
+    if current_match == 0:
+        input("No Current Matches!!")
+        main_menu()
+
     while True:
         name = input(f"{spacer}Enter name you wish to search from roster: ")
         name = name.lower()
 
         if name == "x":
-            main()
+            main_menu()
             break
 
         if not any(name in player.name.lower() for player in current_players):
@@ -276,7 +277,7 @@ def stats():
         scan_id = input(f"{spacer}\nSwipe Card    ID:")
 
         if scan_id.lower() == "x":
-            main()
+            main_menu()
             break
 
         try:
@@ -291,6 +292,7 @@ def stats():
 
         except ValueError:
             print("Invalid Command!")
+
 
 if __name__ == '__main__':
     pre_main()
