@@ -13,6 +13,8 @@ class Member:
         self.losses = 0
         self.created = created
         self.mmr = int(mmr)
+        self.rank_num = 999
+        self.prank_num = 999
 
         self.bye = 0
         self.blacklist = []

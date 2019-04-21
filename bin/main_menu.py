@@ -7,6 +7,7 @@ from os import system
 import names
 
 from bin.MySQL import *
+from bin.html_writer import write_html
 from bin.ranked.ranked_match import Match, RankedMatch
 from bin.ranked.ranked_member import Member, RankedMember
 
@@ -27,8 +28,6 @@ def pre_main():
     global spacer
     spacer = "==============================\n"
 
-
-
     event_tp = input("What Format?")
 
     if event_tp == "normal":
@@ -38,11 +37,12 @@ def pre_main():
         match_type = RankedMatch
         member_type = RankedMember
 
-    test_players = [member_type(name=names.get_first_name(), id=i, mmr=random.randint(800, 1300), winloss='000000') for
-                    i in range(18)]
+    # test_players = [member_type(name=names.get_first_name(), id=i, mmr=random.randint(800, 1300), winloss='000000')
+    #                 for i in range(28)]
+    # for player in test_players:
+    #     add_player((player.id, player.name, 1000, '000000', datetime.date.today()))
 
     registered_players = []
-    registered_players += test_players
     for player in get_players():
         registered_players.append(
             member_type(id=player[0],
@@ -52,8 +52,9 @@ def pre_main():
                         created=player[4]))
 
     current_players = []
-    current_players += test_players
+    current_players += registered_players
     current_match = match_type([], 0)
+
     print("Pre-main done!")
     main_menu()
 
@@ -77,18 +78,25 @@ def main_menu():
             continue
 
         if put == "b":
-            for match in current_match.matches:
-                match[0].win(match[1])
+            current_match.re_rank(registered_players)
+            write_html(registered_players)
 
         if put in ("matchmake", "mm"):
-            if current_match.num_matches != 0:
-                if input("Not all matches have been concluded! ") == "force":
-                    current_match = match_type(current_players, current_match.round_number + 1)
-                    continue
-                else:
-                    continue
-            else:
+            # if current_match.num_matches != 0:
+            #     if input("Not all matches have been concluded! ") == "force":
+            #         current_match.re_rank(registered_players)
+            #         write_html(registered_players)
+            #         current_match = match_type(current_players, current_match.round_number + 1)
+            #         continue
+            #     else:
+            #         continue
+            # else:
+            for i in range(4):
+                current_match.re_rank(registered_players)
+                write_html(registered_players)
                 current_match = match_type(current_players, current_match.round_number + 1)
+                for match in current_match.matches:
+                    match[0].win(match[1])
                 continue
 
         if put == "reset":
@@ -96,7 +104,7 @@ def main_menu():
             break
 
         if put == "clear":
-            tmp = input("ARE YOU SURE YOU WANT TO CLEAR SQL DATABASE?!?")
+            tmp = input("ARE YOU SURE YOU WANT TO CLEAR SQL DATABASE?!? ")
             if tmp == "ironisbronze":
                 delete()
                 pre_main()

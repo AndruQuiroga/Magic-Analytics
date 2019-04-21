@@ -3,6 +3,13 @@ import os
 import pickle
 import random
 
+ranked_dict = {
+    range(1, 1050): "Silver",
+    range(1050, 1100): "Gold",
+    range(1100, 1150): "Platinum",
+    range(1150, 1800): "Diamond",
+}
+
 
 class Match:
 
@@ -29,6 +36,18 @@ class Match:
             self.pick_matches()
             self.export_round()
             self.save_round()
+
+    @staticmethod
+    def re_rank(players):
+        players.sort(reverse=True)
+        for rank, player in enumerate(players):
+            player.prank_num = player.rank_num
+            player.rank_num = rank + 1
+            for key in ranked_dict:
+                if player.mmr in key:
+                    player.rank = ranked_dict[key]
+            if player.rank_num < 6 and player.mmr >= 1200 :
+                player.rank = "Mythic"
 
     def pick(self, players):
         if len(players) < 2:

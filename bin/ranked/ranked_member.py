@@ -7,8 +7,7 @@ ranked_dict = {
     range(900, 1050): "Silver",
     range(1050, 1100): "Gold",
     range(1100, 1150): "Platinum",
-    range(1150, 1200): "Diamond",
-    range(1200, 1800): "Mythic",
+    range(1150, 1200): "Diamond"
 }
 
 
@@ -17,11 +16,6 @@ class RankedMember(Member):
     def __init__(self, name="", id=None, mmr=1000, winloss='000000', created=None):
 
         super().__init__(name, id, mmr, winloss, created)
-
-        for key in ranked_dict:
-            if self.mmr in key:
-                self.rank = ranked_dict[key]
-        self.rank_num = 999
 
     def __str__(self):
         return f"NAME: {self.name}\nID: {self.id}\nRank: {self.rank} : {self.rank_num}\nW/L: {self.career_wins}:{self.career_losses}\nCreated: {self.created}"
