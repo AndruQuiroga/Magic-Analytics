@@ -5,7 +5,7 @@ from os import system
 from os import name as n
 import names
 from bin.MySQL import *
-from bin.match import Match
+from bin.rankedmatch import Match
 from bin.ranked_member import RankedMember
 
 
@@ -16,7 +16,7 @@ def clear():
         system('clear')
 
 
-def reorder():
+def rerank():
     registered_players.sort(reverse=True)
     for rank, player in enumerate(registered_players):
         player.rank_num = rank+1
@@ -43,7 +43,7 @@ def pre_main():
                          winloss=player[3],
                          created=player[4]))
 
-    reorder()
+    rerank()
     current_players = []
     current_players += test_players
     current_match = Match([],0)
