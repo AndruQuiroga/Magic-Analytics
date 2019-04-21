@@ -31,7 +31,21 @@ class Match:
             self.save_round()
 
     def pick(self, players):
-        while len(players) > 1:
+        if len(players) < 2:
+            return
+        elif len(players) == 2:
+            p1 = players[0]
+            p2 = players[1]
+            p1.blacklist = [p2]
+            p2.blacklist = [p1]
+            self.matches.append([p1, p2])
+            self.roster.remove(p1)
+            self.roster.remove(p2)
+            players.remove(p1)
+            players.remove(p2)
+            self.num_matches += 1
+            return
+        else:
             num1 = random.randint(0, len(players) - 1)
             num2 = random.randint(0, len(players) - 1)
             while num2 == num1:
@@ -39,16 +53,18 @@ class Match:
             if players[num2] in players[num1].blacklist:
                 print("Blacklist!")
                 self.pick(players)
+                return
             p1 = players[num1]
             p2 = players[num2]
-            p1.blacklist.append(p2)
-            p2.blacklist.append(p1)
+            p1.blacklist = [p2]
+            p2.blacklist = [p1]
             self.matches.append([p1, p2])
             self.roster.remove(p1)
             self.roster.remove(p2)
             players.remove(p1)
             players.remove(p2)
             self.num_matches += 1
+            return
 
     def pick_bye(self):
         if len(self.roster) % 2 == 1:

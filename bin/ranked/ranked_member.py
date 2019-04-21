@@ -16,8 +16,7 @@ class RankedMember(Member):
 
     def __init__(self, name="", id=None, mmr=1000, winloss='000000', created=None):
 
-        super().__init__(name, id, winloss, created)
-        self.mmr = int(mmr)
+        super().__init__(name, id, mmr, winloss, created)
 
         for key in ranked_dict:
             if self.mmr in key:

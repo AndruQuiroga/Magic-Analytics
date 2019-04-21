@@ -1,14 +1,14 @@
 import datetime
 import pickle
+import random
 from os import name as n
 from os import system
 
 import names
 
 from bin.MySQL import *
-from bin.normal.member import Member
-from bin.ranked.ranked_match import Match
-from bin.ranked.ranked_member import RankedMember
+from bin.ranked.ranked_match import Match, RankedMatch
+from bin.ranked.ranked_member import Member, RankedMember
 
 
 def clear():
@@ -18,46 +18,51 @@ def clear():
         system('clear')
 
 
-def rerank():
-    registered_players.sort(reverse=True)
-    for rank, player in enumerate(registered_players):
-        player.rank_num = rank + 1
-
-
 def pre_main():
     global registered_players
     global current_players
-    global matched
-    global spacer
     global current_match
+    global match_type
+    global member_type
+    global spacer
     spacer = "==============================\n"
 
-    test_players = [Member(name=names.get_first_name(), id=i, winloss='000000') for
+
+
+    event_tp = input("What Format?")
+
+    if event_tp == "normal":
+        match_type = Match
+        member_type = Member
+    else:
+        match_type = RankedMatch
+        member_type = RankedMember
+
+    test_players = [member_type(name=names.get_first_name(), id=i, mmr=random.randint(800, 1300), winloss='000000') for
                     i in range(18)]
 
     registered_players = []
     registered_players += test_players
     for player in get_players():
         registered_players.append(
-            RankedMember(id=player[0],
-                         name=player[1],
-                         mmr=player[2],
-                         winloss=player[3],
-                         created=player[4]))
+            member_type(id=player[0],
+                        name=player[1],
+                        mmr=player[2],
+                        winloss=player[3],
+                        created=player[4]))
 
-    # rerank()
     current_players = []
     current_players += test_players
-    current_match = Match([], 0)
-    matched = []
+    current_match = match_type([], 0)
     print("Pre-main done!")
     main_menu()
 
 
 def main_menu():
     clear()
-    global current_match
 
+    global current_players
+    global current_match
     while True:
 
         put = input(f"{spacer}Insert Command: ")
@@ -71,19 +76,19 @@ def main_menu():
                 print(player.name)
             continue
 
-        if put == "debug":
+        if put == "b":
             for match in current_match.matches:
                 match[0].win(match[1])
 
         if put in ("matchmake", "mm"):
             if current_match.num_matches != 0:
                 if input("Not all matches have been concluded! ") == "force":
-                    current_match = Match(current_players, current_match.round_number + 1)
+                    current_match = match_type(current_players, current_match.round_number + 1)
                     continue
                 else:
                     continue
             else:
-                current_match = Match(current_players, current_match.round_number + 1)
+                current_match = match_type(current_players, current_match.round_number + 1)
                 continue
 
         if put == "reset":
@@ -114,6 +119,7 @@ def main_menu():
 
         if put == "declare" or put == "d":
             declare()
+            break
 
         if put == "load":
             file = open(os.path.join("saves", str(datetime.date.today()), f"round{input('Round #: ')}.obj"), 'rb')
@@ -158,7 +164,7 @@ def add():
                         continue
                     name = input("Create an Account name: ")
                     add_player((scan_id, name, 1000, '000000', datetime.date.today()))
-                    current_players.append(RankedMember(name=name, id=scan_id, created=datetime.date.today()))
+                    current_players.append(member_type(name=name, id=scan_id, created=datetime.date.today()))
                     print(f"{spacer}Account \'{current_players[-1].name}\' Created!")
                 else:
                     for player in registered_players:
@@ -183,7 +189,6 @@ def remove():
             break
 
         if not any(name in player.name.lower() for player in current_players):
-
             print(f"{spacer}Name not in roster!")
             continue
 

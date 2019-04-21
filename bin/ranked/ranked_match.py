@@ -1,3 +1,5 @@
+import datetime
+import os
 import random
 
 from bin.normal.match import Match
@@ -21,10 +23,8 @@ class RankedMatch(Match):
     def pick_matches(self):
         while len(self.roster) >= 4:
             picks = self.pick(self.roster[0:4])
-            picks[0].blacklist = []
-            picks[1].blacklist = []
-            picks[0].blacklist.append(picks[1])
-            picks[1].blacklist.append(picks[0])
+            picks[0].blacklist = [picks[1]]
+            picks[1].blacklist = [picks[0]]
             self.roster.remove(picks[0])
             self.roster.remove(picks[1])
             self.matches.append([picks[0], picks[1]])
@@ -32,8 +32,8 @@ class RankedMatch(Match):
 
         if len(self.roster) == 2:
             self.matches.append([self.roster[0], self.roster[1]])
-            self.roster[0].blacklist.append(self.roster[1])
-            self.roster[1].blacklist.append(self.roster[0])
+            self.roster[0].blacklist = [self.roster[1]]
+            self.roster[1].blacklist = [self.roster[0]]
             self.roster.remove(self.roster[-1])
             self.roster.remove(self.roster[-1])
             self.num_matches += 1

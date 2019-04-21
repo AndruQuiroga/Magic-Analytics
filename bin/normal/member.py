@@ -3,7 +3,7 @@ from bin.MySQL import update_normal
 
 class Member:
 
-    def __init__(self, name="", id=None, winloss='000000', created=None):
+    def __init__(self, name="", id=None, mmr=1000, winloss='000000', created=None):
 
         self.name = name
         self.id = int(id)
@@ -12,6 +12,7 @@ class Member:
         self.wins = 0
         self.losses = 0
         self.created = created
+        self.mmr = int(mmr)
 
         self.bye = 0
         self.blacklist = []
