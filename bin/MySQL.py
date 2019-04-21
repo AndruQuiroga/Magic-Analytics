@@ -1,23 +1,22 @@
-import zipfile
-import mysql.connector
-import time
 import os
+import time
+import zipfile
+
+import mysql.connector
 
 host = "overtimegaming.us.to"
 username = "dreski"
 password = "imidnightsnack15"
 data = "magic_players"
 
-
 database = mysql.connector.connect(
-  host=f"{host}",
-  user=f"{username}",
-  passwd=f"{password}",
-  database=f"{data}"
+    host=f"{host}",
+    user=f"{username}",
+    passwd=f"{password}",
+    database=f"{data}"
 )
 
 my_cursor = database.cursor()
-
 
 
 # my_cursor.execute("SHOW TABLES")
@@ -54,8 +53,6 @@ def get_players():
     return my_cursor.fetchall()
 
 
-
-
 def add_player(val):
     sql = "INSERT INTO players (id, name, mmr, winloss, created) VALUES (%s, %s, %s, %s, %s)"
     my_cursor.execute(sql, val)
@@ -63,14 +60,19 @@ def add_player(val):
     print(my_cursor.rowcount, "record inserted.", val[1])
 
 
-def update(val):
+def update_normal(val):
+    sql = "UPDATE players SET winloss = %s WHERE id = %s"
+    my_cursor.execute(sql, val)
+    database.commit()
+
+
+def update_ranked(val):
     sql = "UPDATE players SET mmr = %s, winloss = %s WHERE id = %s"
     my_cursor.execute(sql, val)
     database.commit()
 
 
 def backup():
-
     filestamp = time.strftime('%Y-%m-%d-%I-%M')
     os.popen(f"mysqldump --all-databases -u {username} -p{password} -c -h {host} > {data}_{filestamp}.sql")
 

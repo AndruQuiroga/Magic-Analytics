@@ -1,12 +1,14 @@
 import datetime
 import pickle
-import random
-from os import system
 from os import name as n
+from os import system
+
 import names
+
 from bin.MySQL import *
-from bin.rankedmatch import Match
-from bin.ranked_member import RankedMember
+from bin.normal.member import Member
+from bin.ranked.ranked_match import Match
+from bin.ranked.ranked_member import RankedMember
 
 
 def clear():
@@ -19,7 +21,7 @@ def clear():
 def rerank():
     registered_players.sort(reverse=True)
     for rank, player in enumerate(registered_players):
-        player.rank_num = rank+1
+        player.rank_num = rank + 1
 
 
 def pre_main():
@@ -30,7 +32,7 @@ def pre_main():
     global current_match
     spacer = "==============================\n"
 
-    test_players = [RankedMember(name=names.get_first_name(), id=i, mmr=random.randint(700, 1400), winloss='000000') for
+    test_players = [Member(name=names.get_first_name(), id=i, winloss='000000') for
                     i in range(18)]
 
     registered_players = []
@@ -43,10 +45,10 @@ def pre_main():
                          winloss=player[3],
                          created=player[4]))
 
-    rerank()
+    # rerank()
     current_players = []
     current_players += test_players
-    current_match = Match([],0)
+    current_match = Match([], 0)
     matched = []
     print("Pre-main done!")
     main_menu()
@@ -70,12 +72,14 @@ def main_menu():
             continue
 
         if put == "debug":
-            print(len(current_match.matches))
+            for match in current_match.matches:
+                match[0].win(match[1])
 
         if put in ("matchmake", "mm"):
             if current_match.num_matches != 0:
                 if input("Not all matches have been concluded! ") == "force":
-                    current_match = Match(current_players, current_match.round_number+1)
+                    current_match = Match(current_players, current_match.round_number + 1)
+                    continue
                 else:
                     continue
             else:
@@ -112,7 +116,7 @@ def main_menu():
             declare()
 
         if put == "load":
-            file = open(os.path.join(str(datetime.date.today()), f"round{input('Round #: ')}.obj"), 'rb')
+            file = open(os.path.join("saves", str(datetime.date.today()), f"round{input('Round #: ')}.obj"), 'rb')
             current_match = pickle.load(file)
             continue
 
@@ -129,8 +133,8 @@ def main_menu():
         else:
             print("INVALID COMMAND! Try \'help\'.")
 
-def add():
 
+def add():
     clear()
     global current_players
     while True:
@@ -150,6 +154,8 @@ def add():
                 if not any(int(scan_id) == player.id for player in registered_players):
                     print(f"{spacer}ID not found in database!")
                     tmp = input("Want to to create a new Account? ")
+                    if tmp not in "yes":
+                        continue
                     name = input("Create an Account name: ")
                     add_player((scan_id, name, 1000, '000000', datetime.date.today()))
                     current_players.append(RankedMember(name=name, id=scan_id, created=datetime.date.today()))
@@ -166,7 +172,6 @@ def add():
 
 
 def remove():
-
     clear()
     global current_players
     while True:
@@ -207,7 +212,6 @@ def remove():
 
 
 def declare():
-
     clear()
     if current_match == 0:
         input("No Current Matches!!")
@@ -237,30 +241,25 @@ def declare():
                     answer = input(f"{spacer}looking for {player.name}? ")
                     answer.lower()
 
-                print(player.declared)
+                found_player = 0
+                for match in current_match.matches:
+                    if player in match:
+                        found_player = 1
+                if found_player == 0:
+                    print(f"{player.name} has already concluded his/her match!")
 
-                if player.declared == 1:
-                    print(f"{spacer}{player.name} already won this round!!")
-                    continue
-                if player.declared == -1:
-                    print(f"{spacer}{player.name} already lost this round!!")
-                    continue
                 else:
-                    tmp = input(f"Are you sure you want {player.name}? ")
+                    tmp = input(f"Are you sure {player.name} won? ")
                     tmp = tmp.lower()
                     if tmp in "yes":
-                        found_player = 0
                         for match in current_match.matches:
                             if player in match:
-                                found_player = 1
                                 match.remove(player)
                                 loser = match[0]
                                 print(f"{spacer}{player.name} beat {loser.name}!!")
                                 player.win(loser)
                                 current_match.matches.remove(match)
                                 current_match.save_round()
-                        if found_player == 0:  # todo ranked objects do not retain self.declared
-                            print("Could not find player in current match!")
 
             except StopIteration:
                 print(f"{spacer}No more players by the Keyword {name}!")
@@ -271,7 +270,6 @@ def declare():
 
 
 def stats():
-
     clear()
     while True:
         scan_id = input(f"{spacer}\nSwipe Card    ID:")
