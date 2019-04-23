@@ -3,6 +3,8 @@ import pickle
 import random
 from os import name as n
 from os import system
+from tkinter import ttk
+from tkinter import *
 
 import names
 
@@ -27,10 +29,9 @@ def pre_main(gu):
     global current_match
     global match_type
     global member_type
-    global spacer
     spacer = "==============================\n"
 
-    event_tp = input("What Format?")
+    event_tp = ""
 
     if event_tp == "normal":
         match_type = Match
@@ -106,7 +107,7 @@ def main_menu(put):
             gui.write_to_log("INCORRECT PASSWORD")
 
     if put == "add" or put == "a":
-        add()
+        add_popup()
 
     if put == "remove" or put == "r":
         remove()
@@ -122,7 +123,7 @@ def main_menu(put):
         current_match = pickle.load(file)
 
     if put == "help" or put == "?":
-        gui.write_to_log(f"{spacer}Valid Commands:"
+        gui.write_to_log(f"Valid Commands:"
               f"\nAdd: Add a player to the roster"
               f"\nRemove: Remove a player from roster"
               f"\nMatchMake: Create matchups"
@@ -135,41 +136,39 @@ def main_menu(put):
         gui.write_to_log("INVALID COMMAND! Try \'help\'.")
 
 
-def add():
-    clear()
+
+
+def add(scan_id):
     global current_players
-    while True:
 
-        scan_id = input(f"{spacer}\nSwipe Card    ID:")
+    if scan_id.lower() == "x":
+        return
 
-        if scan_id.lower() == "x":
-            main_menu()
-            break
+    try:
+        if any(int(scan_id) == player.id for player in current_players):
+            gui.write_to_log(f"Player Already Logged In!")
+            gui.write_to_log(f"Current Players: {len(current_players)}!")
 
-        try:
-            if any(int(scan_id) == player.id for player in current_players):
-                gui.write_to_log(f"{spacer}Player Already Logged In!")
-                gui.write_to_log(f"{spacer}Current Players: {len(current_players)}!")
-
+        else:
+            if not any(int(scan_id) == player.id for player in registered_players):
+                gui.write_to_log(f"ID not found in database!")
+                tmp = input("Want to to create a new Account? ")
+                if tmp not in "yes":
+                    return
+                name = input("Create an Account name: ")
+                add_player((scan_id, name, 1000, '000000', datetime.date.today()))
+                current_players.append(member_type(name=name, id=scan_id, created=datetime.date.today()))
+                gui.write_to_log(f"Account \'{current_players[-1].name}\' Created!")
             else:
-                if not any(int(scan_id) == player.id for player in registered_players):
-                    gui.write_to_log(f"{spacer}ID not found in database!")
-                    tmp = input("Want to to create a new Account? ")
-                    if tmp not in "yes":
-                        continue
-                    name = input("Create an Account name: ")
-                    add_player((scan_id, name, 1000, '000000', datetime.date.today()))
-                    current_players.append(member_type(name=name, id=scan_id, created=datetime.date.today()))
-                    gui.write_to_log(f"{spacer}Account \'{current_players[-1].name}\' Created!")
-                else:
-                    for player in registered_players:
-                        if int(scan_id) == player.id:
-                            gui.write_to_log(f"{spacer}Welcome {player.name}!")
-                            gui.write_to_log(f"{player.name} added to the current Roster")
-                            current_players.append(player)
-                            gui.write_to_log(f"{spacer}Current Players: {len(current_players)}!")
-        except ValueError as e:
-            gui.write_to_log("Invalid Command: " + e.__str__())
+                for player in registered_players:
+                    if int(scan_id) == player.id:
+                        gui.write_to_log(f"Welcome {player.name}!")
+                        gui.write_to_log(f"{player.name} added to the current Roster")
+                        current_players.append(player)
+                        gui.write_to_log(f"Current Players: {len(current_players)}!")
+    except ValueError as e:
+        gui.write_to_log("Invalid Command: ")
+
 
 
 def remove():
