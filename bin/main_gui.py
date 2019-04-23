@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import ttk
-
 from bin import main_menu_gui
 
 
