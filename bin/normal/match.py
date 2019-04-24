@@ -3,6 +3,8 @@ import os
 import pickle
 import random
 
+from bin.normal.match_up import MatchUp
+
 ranked_dict = {
     range(1, 1050): "Silver",
     range(1050, 1100): "Gold",
@@ -57,7 +59,7 @@ class Match:
             p2 = players[1]
             p1.blacklist = [p2]
             p2.blacklist = [p1]
-            self.matches.append([p1, p2])
+            self.matches.append(MatchUp(p1, p2))
             self.roster.remove(p1)
             self.roster.remove(p2)
             players.remove(p1)
@@ -77,7 +79,7 @@ class Match:
             p2 = players[num2]
             p1.blacklist = [p2]
             p2.blacklist = [p1]
-            self.matches.append([p1, p2])
+            self.matches.append(MatchUp(p1, p2))
             self.roster.remove(p1)
             self.roster.remove(p2)
             players.remove(p1)
