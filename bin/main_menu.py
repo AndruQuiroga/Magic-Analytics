@@ -1,15 +1,12 @@
 import datetime
 import pickle
-import random
 from os import name as n
 from os import system
 
-import names
-
 from bin.MySQL import *
 from bin.html_writer import write_html
-from bin.ranked.ranked_match import Match, RankedMatch
-from bin.ranked.ranked_member import Member, RankedMember
+from bin.formats.ranked.ranked_match import Match, RankedMatch
+from bin.formats.ranked.ranked_member import Member, RankedMember
 
 
 def clear():

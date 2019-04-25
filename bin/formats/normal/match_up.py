@@ -1,8 +1,7 @@
 
-
 class MatchUp:
 
-    def __init__(self, player1, player2):
+    def __init__(self, player1, player2, player3=None, player4=None):
 
         self.player1 = player1
         self.player2 = player2
@@ -26,9 +25,5 @@ class MatchUp:
         return f"{self.winner.name} Already beat {self.loser.name}!"
 
     def __getitem__(self, item):
-        if item == 0:
-            return self.player1
-        elif item == 1:
-            return self.player2
-        else:
-            raise IndexError
+        list = [self.player1, self.player2]
+        return list[item]

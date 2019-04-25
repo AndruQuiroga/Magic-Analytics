@@ -1,10 +1,8 @@
-import datetime
-import os
 from tkinter import *
 from tkinter import ttk, messagebox
-from bin import main_menu_gui
 from bin.main_menu_gui import MainMenu
-from bin.normal.match import Match
+from bin.formats.ranked.ranked_match import RankedMatch, Match
+from bin.formats.ranked.ranked_member import RankedMember, Member
 
 
 class MainGUI:
@@ -13,7 +11,7 @@ class MainGUI:
         self.main = Tk()
         self.main.title("Magic")
         self.title = Label(self.main, text="This is out label!")
-        self.main.geometry("{}x{}".format(560, 360))
+        self.main.geometry("{}x{}".format(320, 320))
         self.main.configure(background='white')
 
         self.n = ttk.Notebook(self.main)
@@ -37,15 +35,32 @@ class MainGUI:
         self.roster_list.pack(side="right", pady=5, padx=5)
 
         self.button = Button(self.button_frame, text="Add Player", width=12, command=self.add_player)
-        self.button.pack(side="top", pady=5, padx=5)
+        self.button.pack(side="top", pady=5, padx=8)
 
         self.button1 = Button(self.button_frame, text="Remove Player", width=12, command=self.remove_player)
-        self.button1.pack(side="top")
+        self.button1.pack(side="top", pady=5, padx=8)
 
         self.button2 = Button(self.button_frame, text="Match Make", width=12, command=self.match_make_command)
-        self.button2.pack(side="top")
+        self.button2.pack(side="top", pady=5, padx=8)
 
-        self.info_txt = StringVar()  # todo move
+        self.radio_frame = Frame(self.button_frame)
+        self.radio_frame.pack(side="top")
+
+        modes = [
+            ("R", "Ranked"),
+            ("N", "Normal"),
+            ("C", "Commander"),
+        ]
+
+        self.format = StringVar()
+        self.format.set("L")  # initialize
+
+        for text, mode in modes:
+            self.b = Radiobutton(self.radio_frame, text=text,
+                            variable=self.format, value=mode, indicatoron=0, width=3)
+            self.b.pack(anchor=W, side="right")
+
+        self.info_txt = StringVar()
 
         self.main_menu = MainMenu()
         self.update_roster()
@@ -79,26 +94,6 @@ class MainGUI:
         put.delete(0, 'end')
 
     def remove_player(self):
-        # popup = Toplevel()
-        # popup.title("Removing Player")
-        # popup.geometry("280x80")
-        #
-        # self.info_txt.set("")
-        #
-        # info = Label(popup, textvariable=self.info_txt)
-        # info.pack(pady=5, padx=5)
-        #
-        # frame = Frame(popup)
-        # frame.pack(pady=5, padx=5)
-        #
-        # directions = Label(frame, text="Player Name: ")
-        # directions.pack(side="left")
-        #
-        # global put
-        # put = Entry(frame, width=30)
-        # put.bind("<Return>", self.remove_player_command)
-        # put.pack(side="left", fill="x")
-
         player = self.main_menu.current_players[self.roster_list.curselection()[0]]
         answer = messagebox.askyesno("Removing Player:",
                                      f"Are you sure you want to remove {player.name} from the roster?")
@@ -106,47 +101,23 @@ class MainGUI:
             self.roster_list.delete(self.roster_list.curselection())
             self.main_menu.current_players.remove(player)
 
-
-
-
-    # def remove_player_command(self, *args):
-    #     self.main_menu.remove_player(self.info_txt, put.get())
-    #     put.delete(0, 'end')
-    #     self.update_roster()
-
-    def match_make(self):
-        popup = Toplevel()
-        popup.title("Match Make")
-        popup.geometry("280x80")
-
-        self.info_txt.set("")
-
-        info = Label(popup, textvariable=self.info_txt)
-        info.pack(pady=5, padx=5)
-
-        frame = Frame(popup)
-        frame.pack(pady=5, padx=5)
-
-        directions = Label(frame, text="Player Name: ")
-        directions.pack(side="left")
-
-        global put
-        put = Listbox(frame, width=30)
-        put.pack(side="left", fill="x")
-
-        # for item in ["one", "two", "three", "four"]:
-        #     put.insert(END, item)
-        #
-        # items = map(int, put.curselection())
-        # for item in items:
-        #     print(item)
-        #
-        # b = Button(frame, text="Delete",
-        #            command=lambda put=put: put.delete(ANCHOR))
-        # b.pack()
-
     def match_make_command(self, *args):
-        self.main_menu.current_match = Match(self.main_menu.current_players,
+        format = self.format.get()
+        if format == "Normal":
+            match_type = Match
+            member_type = Member
+        elif format == "Ranked":
+            match_type = RankedMatch
+            member_type = RankedMember
+        else:
+            match_type = Match
+            member_type = Member
+
+        if self.main_menu.current_match.round_number == 0:
+            self.main_menu.convert_current_players(member_type)
+
+        self.main_menu.current_match.re_rank(self.main_menu.current_players)
+        self.main_menu.current_match = match_type(self.main_menu.current_players,
                                        self.main_menu.current_match.round_number + 1)
         frame = self.add_notebook(f"Round #{self.main_menu.current_match.round_number}")
 
@@ -163,7 +134,6 @@ class MainGUI:
             txt.insert('end', match.player1.name)
             txt1.insert('end', " VS ")
             txt2.insert('end', match.player2.name)
-
 
     def add_notebook(self, name):
         frame = Frame(self.n)

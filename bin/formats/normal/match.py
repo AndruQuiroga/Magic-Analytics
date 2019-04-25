@@ -3,7 +3,7 @@ import os
 import pickle
 import random
 
-from bin.normal.match_up import MatchUp
+from bin.formats.normal.match_up import MatchUp
 
 ranked_dict = {
     range(1, 1050): "Silver",
@@ -16,9 +16,6 @@ ranked_dict = {
 class Match:
 
     def __init__(self, current_players, round_number=1, type="Normal"):
-
-        for player in current_players:
-            player.declared = 0
 
         self.roster = []
         self.roster += current_players
@@ -52,47 +49,25 @@ class Match:
                 player.rank = "Mythic"
 
     def pick(self, players):
-        if len(players) < 2:
-            return
-        elif len(players) == 2:
-            p1 = players[0]
-            p2 = players[1]
-            p1.blacklist = [p2]
-            p2.blacklist = [p1]
-            self.matches.append(MatchUp(p1, p2))
-            self.roster.remove(p1)
-            self.roster.remove(p2)
-            players.remove(p1)
-            players.remove(p2)
-            self.num_matches += 1
-            return
-        else:
-            num1 = random.randint(0, len(players) - 1)
-            num2 = random.randint(0, len(players) - 1)
-            while num2 == num1:
-                num2 = random.randint(0, len(players) - 1)
-            if players[num2] in players[num1].blacklist:
+        while len(players) > 1:
+            picks = random.sample(players, 2)
+            if picks[1] in picks[0].blacklist:
                 print("Blacklist!")
-                self.pick(players)
-                return
-            p1 = players[num1]
-            p2 = players[num2]
-            p1.blacklist = [p2]
-            p2.blacklist = [p1]
-            self.matches.append(MatchUp(p1, p2))
-            self.roster.remove(p1)
-            self.roster.remove(p2)
-            players.remove(p1)
-            players.remove(p2)
+                return self.pick(players)
+            picks[0].set_blacklist(picks[1])
+            self.matches.append(MatchUp(picks[0], picks[1]))
+            for pick in picks:
+                self.roster.remove(pick)
+                players.remove(pick)
             self.num_matches += 1
             return
 
     def pick_bye(self):
         if len(self.roster) % 2 == 1:
-            self.bye = self.roster[random.randint(0, len(self.roster) - 1)]
+            self.bye = random.sample(self.roster, 1)
             while self.bye.bye == 1:
                 print("Bye Blacklist!")
-                self.bye = self.roster[random.randint(0, len(self.roster) - 1)]
+                return self.pick_bye()
             self.bye.bye = 1
             self.roster.remove(self.bye)
 

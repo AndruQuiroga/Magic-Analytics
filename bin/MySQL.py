@@ -3,8 +3,7 @@ import time
 import zipfile
 
 import mysql.connector
-
-host = "overtimegaming.us.to"
+host = "localhost"
 username = "dreski"
 password = "imidnightsnack15"
 data = "magic_players"
@@ -96,4 +95,5 @@ def delete():
 
 
 if __name__ == '__main__':
+    # first_time()
     pass

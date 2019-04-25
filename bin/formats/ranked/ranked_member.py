@@ -1,6 +1,6 @@
 from bin import my_math
 from bin.MySQL import update_ranked
-from bin.normal.member import Member
+from bin.formats.normal.member import Member
 
 ranked_dict = {
     range(1, 900): "Bronze",
@@ -13,8 +13,7 @@ ranked_dict = {
 
 class RankedMember(Member):
 
-    def __init__(self, name="", id=None, mmr=1000, winloss='000000', created=None):
-
+    def __init__(self, name, id, mmr, winloss, created):
         super().__init__(name, id, mmr, winloss, created)
 
     def __str__(self):
