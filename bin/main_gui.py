@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import ttk, messagebox
+
+from bin.formats.normal.match_up import MatchUp
 from bin.main_menu_gui import MainMenu
 from bin.formats.ranked.ranked_match import RankedMatch, Match
 from bin.formats.ranked.ranked_member import RankedMember, Member
@@ -57,7 +59,7 @@ class MainGUI:
 
         for text, mode in modes:
             self.b = Radiobutton(self.radio_frame, text=text,
-                            variable=self.format, value=mode, indicatoron=0, width=3)
+                                 variable=self.format, value=mode, indicatoron=0, width=3)
             self.b.pack(anchor=W, side="right")
 
         self.info_txt = StringVar()
@@ -118,22 +120,100 @@ class MainGUI:
 
         self.main_menu.current_match.re_rank(self.main_menu.current_players)
         self.main_menu.current_match = match_type(self.main_menu.current_players,
-                                       self.main_menu.current_match.round_number + 1)
+                                                  self.main_menu.current_match.round_number + 1)
         frame = self.add_notebook(f"Round #{self.main_menu.current_match.round_number}")
 
-        txt = Listbox(frame, width=16)
-        txt.bind("<Double-Button-1>", lambda e: self.main_menu.declare((txt.curselection()[0], -1)))
-        txt.pack(side="left", fill="both")
-        txt1 = Listbox(frame, width=4, relief=FLAT)
-        txt1.pack(side="left", fill="both")
-        txt2 = Listbox(frame, width=16)
-        txt2.bind("<Double-Button-1>", lambda e: self.main_menu.declare((-1, txt2.curselection()[0])))
-        txt2.pack(side="left", fill="both")
+        def remake():
+            txt.delete(0, 'end')
+            txt1.delete(0, 'end')
+            txt2.delete(0, 'end')
+            for match in self.main_menu.current_match.matches:
+                txt.insert('end', match.player1.name)
+                txt1.insert('end', " VS ")
+                txt2.insert('end', match.player2.name)
 
-        for match in self.main_menu.current_match.matches:
-            txt.insert('end', match.player1.name)
-            txt1.insert('end', " VS ")
-            txt2.insert('end', match.player2.name)
+        def remove():
+            if txt.curselection():
+                player = self.main_menu.current_match.matches[txt.curselection()[0]][0]
+                match = self.main_menu.current_match.matches[txt.curselection()[0]]
+            else:
+                player = self.main_menu.current_match.matches[txt2.curselection()[0]][1]
+                match = self.main_menu.current_match.matches[txt2.curselection()[0]]
+
+            answer = messagebox.askyesno("Removing Player:",
+                                         f"Are you sure you want to remove {player.name} from the roster?")
+            if answer:
+                self.main_menu.current_players.remove(player)
+                self.main_menu.current_match.matches.remove(match)
+                self.update_roster()
+                remake()
+
+        def conclude():
+            if txt.curselection():
+                self.main_menu.declare((txt.curselection()[0], -1))
+            else:
+                self.main_menu.declare((-1, txt2.curselection()[0]))
+
+        def manual():
+
+            def manual_command():
+                player1 = next(player for player in self.main_menu.current_players
+                               if player.name == v.get())
+                player2 = next(player for player in self.main_menu.current_players
+                               if player.name == v1.get())
+
+                self.main_menu.current_match.matches.append(MatchUp(player1, player2))
+                popup.destroy()
+                remake()
+
+            if len([player.name for player in self.main_menu.current_players
+                                       if player not in self.main_menu.current_match]) < 2:
+                messagebox.showerror("Error", "Not Enough non-Matched players to Manually Match")
+                return
+
+            popup = Toplevel()
+            popup.title("Adding Players")
+            popup.geometry("280x140")
+
+            v = StringVar()
+            v.set("Player 1")
+            v1 = StringVar()
+            v1.set("Player 2")
+
+            w = OptionMenu(popup, v, *[player.name for player in self.main_menu.current_players
+                                       if player not in self.main_menu.current_match])
+            w1 = OptionMenu(popup, v1, *[player.name for player in self.main_menu.current_players
+                                         if player not in self.main_menu.current_match])
+            w.pack()
+            w1.pack()
+
+            createbut = Button(popup, text="Create Match",
+                          command=manual_command)
+            createbut.pack()
+
+        buttonframe = Frame(frame)
+        buttonframe.pack(side="left", padx=5, pady=5, anchor=N)
+
+        but1 = Button(buttonframe, text="Conclude",
+                      command=conclude)
+        but1.pack(pady=5)
+
+        but2 = Button(buttonframe, text="Remove", command=remove)
+        but2.pack(pady=5)
+
+        but3 = Button(buttonframe, text="Manual", command=manual)
+        but3.pack(pady=5)
+
+        txt = Listbox(frame, width=16, height=15)
+        txt.bind("<Double-Button-1>", lambda e: conclude())
+        txt.pack(side="left")
+        txt1 = Listbox(frame, width=4, height=15, relief=FLAT)
+        txt1.pack(side="left")
+        txt2 = Listbox(frame, width=16, height=15)
+        txt2.bind("<Double-Button-1>", lambda e: conclude())
+        txt2.pack(side="left")
+
+        remake()
 
     def add_notebook(self, name):
         frame = Frame(self.n)

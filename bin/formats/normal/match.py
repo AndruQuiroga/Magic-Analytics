@@ -24,10 +24,17 @@ class Match:
 
         self.type = type
 
-        self.bye = False
+        self.bye = None
         self.matches = []
         self.num_matches = len(self.matches)
         self.match_make()
+
+    def __contains__(self, item):
+        for match in self.matches:
+            if item in match:
+                return True
+        return False
+
 
     def match_make(self):
         if not self.round_number == 0:
@@ -65,9 +72,10 @@ class Match:
     def pick_bye(self):
         if len(self.roster) % 2 == 1:
             self.bye = random.sample(self.roster, 1)
-            while self.bye.bye == 1:
+            while self.bye[0].bye == 1:
                 print("Bye Blacklist!")
                 return self.pick_bye()
+            self.bye = self.bye[0]
             self.bye.bye = 1
             self.roster.remove(self.bye)
 

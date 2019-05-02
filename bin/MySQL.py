@@ -3,7 +3,7 @@ import time
 import zipfile
 
 import mysql.connector
-host = "localhost"
+host = "overtimegaming.us.to"
 username = "dreski"
 password = "imidnightsnack15"
 data = "magic_players"

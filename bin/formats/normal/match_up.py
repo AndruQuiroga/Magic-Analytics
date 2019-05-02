@@ -27,3 +27,6 @@ class MatchUp:
     def __getitem__(self, item):
         list = [self.player1, self.player2]
         return list[item]
+
+    def __contains__(self, item):
+        return item in (self.player1, self.player2)

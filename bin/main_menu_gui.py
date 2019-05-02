@@ -1,10 +1,11 @@
 import datetime
 from tkinter import simpledialog, messagebox
 
-from bin import MySQL
-from bin.formats.commander.command_member import CommanderMember
+# from bin import MySQL
+# from bin.formats.commander.command_member import CommanderMember
 from bin.formats.ranked.ranked_match import Match
 from bin.formats.ranked.ranked_member import Member, RankedMember
+from bin.test_players_offline import TestPlayers
 
 
 class MainMenu:
@@ -15,13 +16,15 @@ class MainMenu:
 
         self.current_match = Match([], 0)
 
-        for player in MySQL.get_players():
-            self.registered_players.append(
-                Member(id=player[0],
-                            name=player[1],
-                            mmr=player[2],
-                            winloss=player[3],
-                            created=player[4]))
+        # for player in MySQL.get_players():  ## online
+        #     self.registered_players.append(
+        #         Member(id=player[0],
+        #                     name=player[1],
+        #                     mmr=player[2],
+        #                     winloss=player[3],
+        #                     created=player[4]))
+
+        self.registered_players = TestPlayers().test_players
 
         self.current_players += self.registered_players
 

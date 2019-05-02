@@ -127,8 +127,8 @@ def main_menu():
             break
 
         if put == "load":
-            file = open(os.path.join("saves", str(datetime.date.today()), f"round{input('Round #: ')}.obj"), 'rb')
-            current_match = pickle.load(file)
+            with open(os.path.join("saves", str(datetime.date.today()), f"round{input('Round #: ')}.obj"), 'rb') as file:
+                current_match = pickle.load(file)
             continue
 
         if put == "help" or put == "?":
