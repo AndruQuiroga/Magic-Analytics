@@ -1,5 +1,6 @@
+import pickle
 from tkinter import *
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 
 from bin.formats.normal.match_up import MatchUp
 from bin.main_menu_gui import MainMenu
@@ -13,7 +14,7 @@ class MainGUI:
         self.main = Tk()
         self.main.title("Magic")
         self.title = Label(self.main, text="This is out label!")
-        self.main.geometry("{}x{}".format(320, 320))
+        self.main.geometry("{}x{}".format(420, 320))
         self.main.configure(background='white')
 
         self.n = ttk.Notebook(self.main)
@@ -47,6 +48,12 @@ class MainGUI:
 
         self.radio_frame = Frame(self.button_frame)
         self.radio_frame.pack(side="top")
+
+        self.button3 = Button(self.button_frame, text="Load Round", width=12, command=self.load_round)
+        self.button3.pack(side="top", pady=5, padx=8)
+
+        self.button4 = Button(self.button_frame, text="Restart", width=12, command=self.restart_matches)
+        self.button4.pack(side="top", pady=5, padx=8)
 
         modes = [
             ("R", "Ranked"),
@@ -103,25 +110,27 @@ class MainGUI:
             self.roster_list.delete(self.roster_list.curselection())
             self.main_menu.current_players.remove(player)
 
-    def match_make_command(self, *args):
-        format = self.format.get()
-        if format == "Normal":
-            match_type = Match
-            member_type = Member
-        elif format == "Ranked":
-            match_type = RankedMatch
-            member_type = RankedMember
+    def match_make_command(self, creatematch=0):
+        if creatematch == 0:
+            format = self.format.get()
+            if format == "Normal":
+                match_type = Match
+                member_type = Member
+            elif format == "Ranked":
+                match_type = RankedMatch
+                member_type = RankedMember
+            else:
+                match_type = Match
+                member_type = Member
+
+            if self.main_menu.current_match.round_number == 0:
+                self.main_menu.convert_current_players(member_type)
+
+            self.main_menu.current_match.re_rank(self.main_menu.current_players)
+            self.main_menu.current_match = match_type(self.main_menu.current_players,
+                                                      self.main_menu.current_match.round_number + 1)
         else:
-            match_type = Match
-            member_type = Member
-
-        if self.main_menu.current_match.round_number == 0:
-            self.main_menu.convert_current_players(member_type)
-
-        self.main_menu.current_match.re_rank(self.main_menu.current_players)
-        self.main_menu.current_match = match_type(self.main_menu.current_players,
-                                                  self.main_menu.current_match.round_number + 1)
-        frame = self.add_notebook(f"Round #{self.main_menu.current_match.round_number}")
+            pass
 
         def remake():
             txt.delete(0, 'end')
@@ -191,17 +200,19 @@ class MainGUI:
                           command=manual_command)
             createbut.pack()
 
+        frame = self.add_notebook(f"Round #{self.main_menu.current_match.round_number}")
+
         buttonframe = Frame(frame)
         buttonframe.pack(side="left", padx=5, pady=5, anchor=N)
 
-        but1 = Button(buttonframe, text="Conclude",
+        but1 = Button(buttonframe, text="Conclude", width=12,
                       command=conclude)
         but1.pack(pady=5)
 
-        but2 = Button(buttonframe, text="Remove", command=remove)
+        but2 = Button(buttonframe, text="Remove", width=12, command=remove)
         but2.pack(pady=5)
 
-        but3 = Button(buttonframe, text="Manual", command=manual)
+        but3 = Button(buttonframe, text="Manual", width=12, command=manual)
         but3.pack(pady=5)
 
         txt = Listbox(frame, width=16, height=15)
@@ -215,14 +226,32 @@ class MainGUI:
 
         remake()
 
+    def load_round(self):
+        popup = Toplevel()
+        file = filedialog.askopenfilename(parent=popup, initialdir="saves", title="Please Select a Save: ",
+                                          filetypes=[("Save Files", ".obj")])
+        if file == ():
+            popup.destroy()
+            return
+        with open(file, "rb") as file:
+            self.main_menu.current_match = pickle.load(file)
+            self.match_make_command(-1)
+        popup.destroy()
+
     def add_notebook(self, name):
         frame = Frame(self.n)
         self.n.add(frame, text=name)
         self.n.pack(fill=BOTH, expand=True)
         return frame
 
-    def remove_notebook(self, tabid):
-        self.n.forget(tabid)
+    def restart_matches(self):
+        answer = messagebox.askokcancel("Warning", "Are you sure you want to restart MakeMaking?")
+
+        if answer:
+            self.main_menu.current_match = Match([], 0)
+
+            while self.n.index("end")-1 >= 2:
+                self.n.forget(self.n.index("end")-1)
 
     def update_roster(self):
         self.roster_list.delete(0, 'end')

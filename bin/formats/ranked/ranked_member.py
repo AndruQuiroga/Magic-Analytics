@@ -1,5 +1,5 @@
 from bin import my_math
-# from bin.MySQL import update_ranked
+from bin.MySQL import update_ranked
 from bin.formats.normal.member import Member
 
 ranked_dict = {

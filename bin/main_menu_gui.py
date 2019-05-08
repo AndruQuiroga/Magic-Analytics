@@ -1,8 +1,8 @@
 import datetime
 from tkinter import simpledialog, messagebox
 
-# from bin import MySQL
-# from bin.formats.commander.command_member import CommanderMember
+from bin import MySQL
+from bin.formats.commander.command_member import CommanderMember
 from bin.formats.ranked.ranked_match import Match
 from bin.formats.ranked.ranked_member import Member, RankedMember
 from bin.test_players_offline import TestPlayers
@@ -16,17 +16,17 @@ class MainMenu:
 
         self.current_match = Match([], 0)
 
-        # for player in MySQL.get_players():  ## online
-        #     self.registered_players.append(
-        #         Member(id=player[0],
-        #                     name=player[1],
-        #                     mmr=player[2],
-        #                     winloss=player[3],
-        #                     created=player[4]))
+        for player in MySQL.get_players():  ## online
+            self.registered_players.append(
+                Member(id=player[0],
+                            name=player[1],
+                            mmr=player[2],
+                            winloss=player[3],
+                            created=player[4]))
 
-        self.registered_players = TestPlayers().test_players
+        # self.registered_players = TestPlayers().test_players ## offline
 
-        self.current_players += self.registered_players
+        # self.current_players += self.registered_players
 
         print("Pre-main done!")
 
@@ -42,7 +42,7 @@ class MainMenu:
                                                   "Create an Account name: ")
                     if name is None:
                         return
-                    MySQL.add_player((scan_id, name, 1000, '000000', datetime.date.today()))
+                    # MySQL.add_player((scan_id, name, 1000, '000000', datetime.date.today()))
                     self.current_players.append(Member(name=name, id=scan_id, mmr=1000, winloss="000000", created=datetime.date.today()))
                     info.set(f"Account \'{self.current_players[-1].name}\' Created!")
                 else:

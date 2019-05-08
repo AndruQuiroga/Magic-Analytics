@@ -1,4 +1,4 @@
-# from bin.MySQL import update_normal
+from bin.MySQL import update_normal
 
 
 class Member:
@@ -39,7 +39,7 @@ class Member:
 
     def save(self):
         winloss = "{:03d}{:03d}".format(self.career_wins, self.career_losses)
-        # update_normal((winloss, str(self.id))) ##online
+        update_normal((winloss, str(self.id))) ##online
 
 
     def lost(self, other):
