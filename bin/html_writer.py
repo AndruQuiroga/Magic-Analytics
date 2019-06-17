@@ -2,7 +2,7 @@ import os
 
 
 def write_html(registered_players):
-    with open(os.path.join("logs", "current_Ranked_ladder.html"), "w") as html:
+    with open(os.path.join("local", "current_Ranked_ladder.html"), "w") as html:
         html.write("""<!DOCTYPE html><html lang="en" xmlns="http://www.w3.org/1999/html"><head><meta charset="UTF-8">
         <title>Ranked Ladder</title>
         </head><body><p><pre>""")
