@@ -34,16 +34,16 @@ def make_local_database(mainmenu):
         os.chdir("..")
 
     if mainmenu.status:
-        normal_members = MySQL.get_members("Normal")
-        ranked_members = MySQL.get_members("Ranked")
+        normal_members = MySQL.get_members("normal")
+        ranked_members = MySQL.get_members("ranked")
 
-        with open(os.path.join(path, f"local_database_Normal.csv"), "w") as file:
+        with open(os.path.join(path, f"local_database_normal.csv"), "w") as file:
             writer = csv.writer(file)
 
             for member in normal_members:
                 writer.writerow([item for item in member])
 
-        with open(os.path.join(path, f"local_database_Ranked.csv"), "w") as file:
+        with open(os.path.join(path, f"local_database_ranked.csv"), "w") as file:
             writer = csv.writer(file)
 
             for member in ranked_members:
@@ -54,7 +54,7 @@ def make_local_database(mainmenu):
         with open(os.path.join(path, f"local_database_{mainmenu.format}.csv"), "w") as file:
             writer = csv.writer(file)
 
-            if mainmenu.format == "Normal":
+            if mainmenu.format == "normal":
                 for member in members:
                     writer.writerow([member.id,
                                      member.name,

@@ -37,9 +37,9 @@ def settings_menu():
     radio_frame.pack(side="left")
 
     modes = [
-        ("Ranked", "Ranked"),
-        ("Normal", "Normal"),
-        ("Commander", "Commander"),
+        ("Ranked", "ranked"),
+        ("Normal", "normal"),
+        ("Commander", "commander"),
     ]
 
     format = StringVar()

@@ -10,7 +10,7 @@ def check_if_folders_exist():
 if __name__ == '__main__':
 
     check_if_folders_exist()
-    main = main_menu.MainMenu("Ranked")
+    main = main_menu.MainMenu("ranked")
     for player in main.current_players:
         player.career_wins += 1
         main.update_members()

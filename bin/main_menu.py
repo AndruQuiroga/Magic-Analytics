@@ -11,8 +11,8 @@ from bin.export import *
 
 class MainMenu:
 
-    format_dict = {"Normal": Player,
-                   "Ranked": RankedPlayer}
+    format_dict = {"normal": Player,
+                   "ranked": RankedPlayer}
 
     def __init__(self, format):
         self.registered_members = []
@@ -34,7 +34,7 @@ class MainMenu:
         else:
             members = make_offline_members(self.format)
 
-        if self.format == "Normal":
+        if self.format == "normal":
             for member in members:
                 self.registered_members.append(
                     Member(id=member[0],
@@ -65,7 +65,7 @@ class MainMenu:
                     if not name:
                         return
 
-                    if self.format == "Normal":
+                    if self.format == "normal":
                         MySQL.add_player_normal((scan_id, name, '000000', datetime.date.today()))
                         self.registered_members.append(
                             Member(name=name, id=scan_id, winloss="000000",
@@ -90,7 +90,7 @@ class MainMenu:
 
     def make_match(self):
         self.update_members()
-        if self.format == "Normal":
+        if self.format == "normal":
             self.current_match = Match(self.current_players, self.current_match.round_number + 1)
 
     def update_members(self):
@@ -98,13 +98,13 @@ class MainMenu:
             member = next(member for member in self.registered_members if member.id == player.id)
             member.career_wins = player.career_wins
             member.career_losses = player.career_losses
-            if self.format == "Ranked":
+            if self.format == "ranked":
                 member.mmr = player.mmr
 
         if self.status:
             print("=" * 40, "\nOnline-Saving Started!")
             for player in self.registered_members:
-                if self.format == "Normal":
+                if self.format == "normal":
                     MySQL.update_normal(
                         (f"{player.career_wins:03d}{player.career_losses:03d}", str(player.id)))
                 else:
