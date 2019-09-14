@@ -14,11 +14,11 @@ def make_last_session(mainmenu):
     print("Done!")
 
 
-def make_offline_members(format):
+def make_offline_members():
     print("Creating Members from last local-offline session!")
     with open(os.path.join("local", f"last_session.json"), "r") as file:
         date = json.load(file)["last_known_session"]
-    with open(os.path.join("local", date, f"local_database_{format}.csv"), "r") as file:
+    with open(os.path.join("local", date, f"local_database.csv"), "r") as file:
         reader = csv.reader(file, delimiter=',')
         members = [member for member in reader]
         print("Done!")
@@ -34,20 +34,28 @@ def make_local_database(mainmenu):
         os.chdir("..")
 
     if mainmenu.status:
-        normal_members = MySQL.get_members("normal")
-        ranked_members = MySQL.get_members("ranked")
+        # normal_members = MySQL.get_members("normal")
+        # ranked_members = MySQL.get_members("ranked")
+        members = MySQL.get_members()
 
-        with open(os.path.join(path, f"local_database_normal.csv"), "w") as file:
+        with open(os.path.join(path, f"local_database.csv"), "w") as file:
             writer = csv.writer(file)
 
-            for member in normal_members:
+            for member in members:
                 writer.writerow([item for item in member])
 
-        with open(os.path.join(path, f"local_database_ranked.csv"), "w") as file:
-            writer = csv.writer(file)
+        # with open(os.path.join(path, f"local_database_normal.csv"), "w") as file:
+        #     writer = csv.writer(file)
+        #
+        #     for member in normal_members:
+        #         writer.writerow([item for item in member])
+        #
+        # with open(os.path.join(path, f"local_database_ranked.csv"), "w") as file:
+        #     writer = csv.writer(file)
+        #
+        #     for member in ranked_members:
+        #         writer.writerow([item for item in member])
 
-            for member in ranked_members:
-                writer.writerow([item for item in member])
     else:
         members = mainmenu.registered_members
 

@@ -24,7 +24,7 @@ class Member:
     def __init__(self, name, id, winloss, created):
 
         self.name = name
-        self.id = int(id)
+        self.id = id
         self.winloss = winloss
         self.career_wins = int(self.winloss[:3])
         self.career_losses = int(self.winloss[3:])
@@ -37,8 +37,8 @@ class Member:
 
 class RankedMember(Member):
 
-    def __init__(self, name, id, mmr, winloss, created):
-        super().__init__(name, id, winloss, created)
+    def __init__(self, name, id, mmr, ranked_winloss, created):
+        super().__init__(name, id, ranked_winloss, created)
         self.mmr = int(mmr)
         self.last_mmr = 0
         self.rank = None

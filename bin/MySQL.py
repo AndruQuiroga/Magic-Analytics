@@ -39,10 +39,10 @@ except mysql.connector.Error as e:
 # my_cursor.execute("CREATE DATABASE magic_players")
 
 
-# my_cursor.execute("SELECT * FROM players")
+# my_cursor.execute("SELECT * FROM normal_members")
 #
 # myresult = my_cursor.fetchall()
-#
+
 # for x in myresult:
 #     print(x)
 
@@ -51,18 +51,21 @@ except mysql.connector.Error as e:
 
 def first_time():
     print("Creating new Database...")
-    my_cursor.execute("CREATE TABLE normal_members \
+    my_cursor.execute("CREATE TABLE members \
                           (id VARCHAR(255) PRIMARY KEY, \
                           name VARCHAR(40), \
-                          winloss VARCHAR(20), \
-                          created VARCHAR(40))")
+                          mmr INT, \
+                          total_winloss VARCHAR(20), \
+                          ranked_winloss VARCHAR(20), \
+                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, \
+                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)")
 
-    my_cursor.execute("CREATE TABLE ranked_members \
-                              (id VARCHAR(255) PRIMARY KEY, \
-                              name VARCHAR(40), \
-                              mmr INT, \
-                              winloss VARCHAR(20), \
-                              created VARCHAR(40))")
+    # my_cursor.execute("CREATE TABLE ranked_members \
+    #                           (id VARCHAR(255) PRIMARY KEY, \
+    #                           name VARCHAR(40), \
+    #                           mmr INT, \
+    #                           winloss VARCHAR(20), \
+    #                           created VARCHAR(40))")
     print("DONE!")
 
 
@@ -78,51 +81,58 @@ def test_online():
     return online
 
 
-def get_members(format):
-    if format == "Normal":
-        my_cursor.execute("SELECT * FROM normal_members")
-        return my_cursor.fetchall()
-    else:
-        my_cursor.execute("SELECT * FROM ranked_members")
-        return my_cursor.fetchall()
+def get_members():
+    # if format == "Normal":
+    #     my_cursor.execute("SELECT * FROM normal_members")
+    #     return my_cursor.fetchall()
+    # else:
+    #     my_cursor.execute("SELECT * FROM ranked_members")
+    #     return my_cursor.fetchall()
+    my_cursor.execute("SELECT * FROM members")
+    return my_cursor.fetchall()
 
 
-def add_player_normal(val):
-    sql = "INSERT INTO normal_members (id, name, winloss, created) VALUES (%s, %s, %s, %s)"
+def add_player(val):
+    sql = "INSERT INTO members (id, name, mmr, total_winloss, ranked_winloss) VALUES (%s, %s, %s, %s, %s)"
     my_cursor.execute(sql, val)
     database.commit()
-    print(my_cursor.rowcount, "record inserted.", val[1])
 
-
-def add_player_ranked(val):
-    sql = "INSERT INTO ranked_members (id, name, mmr, winloss, created) VALUES (%s, %s, %s, %s, %s)"
-    my_cursor.execute(sql, val)
-    database.commit()
+# def add_player_normal(val):
+#     sql = "INSERT INTO normal_members (id, name, winloss, created) VALUES (%s, %s, %s, %s)"
+#     my_cursor.execute(sql, val)
+#     database.commit()
+#     print(my_cursor.rowcount, "record inserted.", val[1])
+#
+#
+# def add_player_ranked(val):
+#     sql = "INSERT INTO ranked_members (id, name, mmr, winloss, created) VALUES (%s, %s, %s, %s, %s)"
+#     my_cursor.execute(sql, val)
+#     database.commit()
 
 
 def update_normal(val):
-    sql = "UPDATE normal_members SET winloss = %s WHERE id = %s"
+    sql = "UPDATE members SET total_winloss = %s WHERE id = %s"
     my_cursor.execute(sql, val)
     database.commit()
 
 
 def update_ranked(val):
-    sql = "UPDATE ranked_members SET mmr = %s, winloss = %s WHERE id = %s"
+    sql = "UPDATE members SET mmr = %s, ranked_winloss = %s WHERE id = %s"
     my_cursor.execute(sql, val)
     database.commit()
 
 
 def update_database():
     print("=" * 40, "\nUpdating database from last local-offline session!")
-    normal = make_offline_members("Normal")
-    for member in normal:
-        update_normal((member[2], member[0]))
-    print(len(normal), "record(s) updated.")
+    online_members = get_members()
+    members = make_offline_members()
+    for member, old_member in zip(members, online_members):
+        if str(old_member[6]) < member[6]:
+            update_ranked((member[2], member[0]))
+        else:
+            print("Up-To-Date Player")
+    print(len(members), "record(s) updated.")
 
-    ranked = make_offline_members("Ranked")
-    for member in ranked:
-        update_ranked((member[2], member[3], member[0]))
-    print(len(ranked), "record(s) updated.")
     print("Successfully updated Online Database!\n", "=" * 40)
 
 
@@ -138,7 +148,8 @@ def backup():
 
 def delete():
     print("Deleting Database...")
-    my_cursor.execute("DROP TABLE players")
+    my_cursor.execute("DROP TABLE ranked_members")
+    my_cursor.execute("DROP TABLE normal_members")
     print("Creating new Database...")
     # my_cursor.execute("CREATE TABLE players \
     #                   (id VARCHAR(255) PRIMARY KEY, \
@@ -152,4 +163,5 @@ def delete():
 if __name__ == '__main__':
     # delete()
     # first_time()
+    update_database()
     pass

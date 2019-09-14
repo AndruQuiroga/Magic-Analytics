@@ -21,7 +21,8 @@ class MainMenu:
         self.status = MySQL.test_online()
 
         self.get_registered_members()
-        self.current_players += [self.format_dict[self.format](member) for member in self.registered_members]
+        self.current_players += [self.format_dict[self.format](member) for member in self.registered_members]  # test
+        # self.current_players = []
         self.current_match = Match([], 0)
         make_last_session(self)
 
@@ -30,7 +31,7 @@ class MainMenu:
 
     def get_registered_members(self):
         if self.status:
-            members = MySQL.get_members(self.format)
+            members = MySQL.get_members()
         else:
             members = make_offline_members(self.format)
 
@@ -39,16 +40,16 @@ class MainMenu:
                 self.registered_members.append(
                     Member(id=member[0],
                            name=member[1],
-                           winloss=member[2],
-                           created=member[3]))
+                           winloss=member[3],
+                           created=member[5]))
         else:
             for member in members:
                 self.registered_members.append(
                     RankedMember(id=member[0],
                                  name=member[1],
                                  mmr=member[2],
-                                 winloss=member[3],
-                                 created=member[4]))
+                                 ranked_winloss=member[4],
+                                 created=member[5]))
 
     def add_player(self, info_box, put):
         scan_id = put.get()
@@ -66,14 +67,14 @@ class MainMenu:
                         return
 
                     if self.format == "normal":
-                        MySQL.add_player_normal((scan_id, name, '000000', datetime.date.today()))
+                        MySQL.add_player((scan_id, name, 1000, '000000', '000000'))
                         self.registered_members.append(
                             Member(name=name, id=scan_id, winloss="000000",
                                    created=datetime.date.today()))
                     else:
-                        MySQL.add_player_ranked((scan_id, name, 1000, '000000', datetime.date.today()))
+                        MySQL.add_player((scan_id, name, 1000, '000000', '000000'))
                         self.registered_members.append(
-                            RankedMember(name=name, id=scan_id, mmr=1000, winloss="000000",
+                            RankedMember(name=name, id=scan_id, mmr=1000, ranked_winloss="000000",
                                          created=datetime.date.today()))
                     self.current_players.append(self.format_dict[self.format](self.registered_members[-1]))
                     info_box.set(f"Account \'{self.current_players[-1].name}\' Created!")
