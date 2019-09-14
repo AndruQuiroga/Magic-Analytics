@@ -1,4 +1,4 @@
-
+from bin import MySQL
 
 def re_rank(ranked_members):
     ranked_dict = {
@@ -64,6 +64,7 @@ class Player(Member):
         self.current_wins += 1
         self.career_wins += 1
         other.lost(self)
+        print(self)
 
     def lost(self, other):
         self.current_losses += 1
@@ -72,6 +73,9 @@ class Player(Member):
     def set_blacklist(self, other):
         self.blacklist = [other]
         other.blacklist = [self]
+
+    def save(self):
+        MySQL.update_normal((f"{self.career_wins:03}{self.career_losses:03}", self.id))
 
 
 class RankedPlayer(RankedMember):
@@ -96,7 +100,7 @@ class RankedPlayer(RankedMember):
             mmr_change = -diff // 8 + 20
             self.mmr += min(mmr_change, 40)
         self.career_wins += 1
-        other.lose(self)
+        other.lost(self)
 
     def lost(self, other):
         diff = self.mmr - other.mmr
@@ -112,6 +116,9 @@ class RankedPlayer(RankedMember):
     def set_blacklist(self, other):
         self.blacklist = [other]
         other.blacklist = [self]
+
+    def save(self):
+        MySQL.update_ranked((self.mmr, self.winloss, self.id))
 
 
 if __name__ == '__main__':

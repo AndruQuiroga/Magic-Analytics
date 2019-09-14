@@ -5,7 +5,7 @@ import csv
 
 from bin import MySQL
 from bin.Member import *
-from bin.match import Match
+from bin.match import Match, RankedMatch
 from bin.export import *
 
 
@@ -23,7 +23,7 @@ class MainMenu:
         self.get_registered_members()
         self.current_players += [self.format_dict[self.format](member) for member in self.registered_members]  # test
         # self.current_players = []
-        self.current_match = Match([], 0)
+        self.current_match = RankedMatch([], 0)
         make_last_session(self)
 
         print("=" * 40, "\nPre-main done!")
@@ -90,27 +90,29 @@ class MainMenu:
             print(ve)
 
     def make_match(self):
-        self.update_members()
+        # self.update_members()
         if self.format == "normal":
             self.current_match = Match(self.current_players, self.current_match.round_number + 1)
+        else:
+            self.current_match = RankedMatch(self.current_players, self.current_match.round_number + 1)
 
     def update_members(self):
-        for player in self.current_players:
-            member = next(member for member in self.registered_members if member.id == player.id)
-            member.career_wins = player.career_wins
-            member.career_losses = player.career_losses
-            if self.format == "ranked":
-                member.mmr = player.mmr
+        # for player in self.current_players:
+        #     member = next(member for member in self.registered_members if member.id == player.id)
+        #     member.career_wins = player.career_wins
+        #     member.career_losses = player.career_losses
+        #     if self.format == "ranked":
+        #         member.mmr = player.mmr
 
         if self.status:
             print("=" * 40, "\nOnline-Saving Started!")
-            for player in self.registered_members:
+            for player in self.current_players:
                 if self.format == "normal":
                     MySQL.update_normal(
                         (f"{player.career_wins:03d}{player.career_losses:03d}", str(player.id)))
                 else:
                     MySQL.update_ranked(
-                        (str(player.mmr), f"{player.career_wins:03d}{player.career_losses:03d}", str(player.id)))
+                        (player.mmr, f"{player.career_wins:03d}{player.career_losses:03d}", str(player.id)))
             print("Online-Saving Finished!")
             print("=" * 40)
 

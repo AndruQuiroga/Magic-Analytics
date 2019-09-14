@@ -1,12 +1,13 @@
 import random
-
+import os
+import datetime
 
 class Match:
 
     def __init__(self, roster, round_number):
 
         self.roster = roster.copy()
-        self.roster.sort(reverse=True, key=lambda x: x.current_wins)
+        self.sort_players()
         self.round_number = round_number
 
         self.match_ups = []
@@ -15,6 +16,10 @@ class Match:
 
         self.pick_bye()
         self.pick_matches()
+        self.export_round()
+
+    def sort_players(self):
+        self.roster.sort(reverse=True, key=lambda x: x.current_wins)
 
     def pick_bye(self):
         if len(self.roster) % 2 != 0:
@@ -52,11 +57,35 @@ class Match:
 
         return
 
+    def export_round(self):
+        path = os.path.join("logs", str(datetime.date.today()))
+        if not os.path.exists(path):
+            os.chdir("logs")
+            os.system("mkdir " + str(datetime.date.today()))
+            os.chdir("..")
+
+        with open(os.path.join(path, f"Round{self.round_number}.txt"), "w") as file:
+            for table, match in enumerate(self.match_ups):
+                file.write(f"Table #{table + 1:02}:  {match[0].name:16} ({match[0].current_wins}:{match[0].current_losses}) "
+                           f"vs {match[1].name:16} ({match[1].current_wins}:{match[1].current_losses})\n")
+
+            file.write(f"====================================================================\n")
+
+            for table, match in enumerate(self.match_ups):
+                file.write(f"Table #{table + 1:02}:  {match[1].name:16} ({match[1].current_wins}:{match[1].current_losses}) "
+                           f"vs {match[0].name:16} ({match[0].current_wins}:{match[0].current_losses})\n")
+
+            if self.bye:
+                file.write(f"\nBye: {self.bye.name}")
+
 
 class RankedMatch(Match):
 
     def __init__(self, roster, round_number=1):
         super().__init__(roster, round_number)
+
+    def sort_players(self):
+        self.roster.sort(reverse=True, key=lambda x: x.mmr)
 
     def pick_matches(self):
         while len(self.roster) >= 4:
@@ -81,6 +110,8 @@ class MatchUp:
             self.loser = self.player1
 
         self.winner.win(self.loser)
+        self.player1.save()
+        self.player2.save()
         self.match_concluded = True
 
     def __str__(self):

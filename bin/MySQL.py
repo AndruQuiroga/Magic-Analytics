@@ -113,6 +113,7 @@ def add_player(val):
 def update_normal(val):
     sql = "UPDATE members SET total_winloss = %s WHERE id = %s"
     my_cursor.execute(sql, val)
+    print("Player Updated")
     database.commit()
 
 
@@ -163,5 +164,5 @@ def delete():
 if __name__ == '__main__':
     # delete()
     # first_time()
-    update_database()
+    # update_database()
     pass

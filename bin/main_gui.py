@@ -16,7 +16,6 @@ def main():
     n.add(mm, text='Roster')
     n.pack(fill=BOTH, expand=True)
 
-
     settings_menu()
     gui.mainloop()
 
@@ -147,8 +146,8 @@ def match_make():
 
         if txt.curselection():
             match_up = main_menu.current_match.match_ups[txt.curselection()[0]]
-            winner = match_up[1]
-            loser = match_up[0]
+            winner = match_up[0]
+            loser = match_up[1]
         else:
             match_up = main_menu.current_match.match_ups[txt2.curselection()[0]]
             winner = match_up[1]
