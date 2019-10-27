@@ -1,34 +1,37 @@
 from bin import MySQL
 
-def re_rank(ranked_members):
-    ranked_dict = {
-        range(1, 900): "Bronze",
-        range(900, 1050): "Silver",
-        range(1050, 1100): "Gold",
-        range(1100, 1150): "Platinum",
-        range(1150, 1200): "Diamond"
-    }
-
-    ranked_members.sort(reverse=True)
-    for rank, member in enumerate(ranked_members):
-
-        for key in ranked_dict:
-            if member.mmr in key:
-                member.rank = f"{rank + 1}|{ranked_dict[key]}|{member.mmr > member.last_mmr}"
-        if rank <= 6 and member.mmr >= 1200:
-            member.rank = f"{rank + 1}|Mythic|{member.mmr > member.last_mmr}"
-
 
 class Member:
+
+    @staticmethod
+    def re_rank(ranked_members):
+        ranked_dict = {
+            range(1, 900): "Bronze",
+            range(900, 1050): "Silver",
+            range(1050, 1100): "Gold",
+            range(1100, 1150): "Platinum",
+            range(1150, 1200): "Diamond"
+        }
+        ranked_members.sort(reverse=True)
+        for rank, member in enumerate(ranked_members):
+
+            for key in ranked_dict:
+                if member.mmr in key:
+                    member.rank = f"{rank + 1}|{ranked_dict[key]}|{member.mmr > member.last_mmr}"
+            if rank <= 6 and member.mmr >= 1200:
+                member.rank = f"{rank + 1}|Mythic|{member.mmr > member.last_mmr}"
 
     def __init__(self, name, id, winloss, created):
 
         self.name = name
         self.id = id
-        self.winloss = winloss
-        self.career_wins = int(self.winloss[:3])
-        self.career_losses = int(self.winloss[3:])
+        self.career_wins = int(winloss[:3])
+        self.career_losses = int(winloss[3:])
         self.created = created
+
+    @property
+    def winloss(self):
+        return f'{self.career_wins:03}{self.career_losses:03}'
 
     def __str__(self):
         return f"NAME: {self.name}\nID: {self.id}\nW/L: " \
@@ -75,7 +78,7 @@ class Player(Member):
         other.blacklist = [self]
 
     def save(self):
-        MySQL.update_normal((f"{self.career_wins:03}{self.career_losses:03}", self.id))
+        MySQL.update_normal((self.winloss, self.id))
 
 
 class RankedPlayer(RankedMember):

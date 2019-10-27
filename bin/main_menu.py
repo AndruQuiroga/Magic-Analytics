@@ -56,32 +56,32 @@ class MainMenu:
         put.delete(0, 'end')
 
         try:
-            if any(int(scan_id) == player.id for player in self.current_players):
+            if any(scan_id == player.id for player in self.current_players):
                 info_box.set("Player Already Logged In!")
 
             else:
-                if not any(int(scan_id) == player.id for player in self.registered_members):
+                if not any(scan_id == player.id for player in self.registered_members):
                     name = simpledialog.askstring("ID not found in database!\nWant to to create a new Account? ",
                                                   "Create an Account name: ")
                     if not name:
                         return
 
                     if self.format == "normal":
-                        MySQL.add_player((scan_id, name, 1000, '000000', '000000'))
                         self.registered_members.append(
                             Member(name=name, id=scan_id, winloss="000000",
                                    created=datetime.date.today()))
                     else:
-                        MySQL.add_player((scan_id, name, 1000, '000000', '000000'))
                         self.registered_members.append(
                             RankedMember(name=name, id=scan_id, mmr=1000, ranked_winloss="000000",
                                          created=datetime.date.today()))
+
+                    MySQL.add_player((scan_id, name, 1000, '000000', '000000'))
                     self.current_players.append(self.format_dict[self.format](self.registered_members[-1]))
                     info_box.set(f"Account \'{self.current_players[-1].name}\' Created!")
 
                 else:
                     for player in self.registered_members:
-                        if int(scan_id) == player.id:
+                        if scan_id == player.id:
                             info_box.set(f"Welcome {player.name}!\n{player.name} added to the current Roster")
                             self.current_players.append(self.format_dict[self.format](player))
 
@@ -90,7 +90,7 @@ class MainMenu:
             print(ve)
 
     def make_match(self):
-        # self.update_members()
+        self.update_members()
         if self.format == "normal":
             self.current_match = Match(self.current_players, self.current_match.round_number + 1)
         else:
@@ -101,20 +101,20 @@ class MainMenu:
         #     member = next(member for member in self.registered_members if member.id == player.id)
         #     member.career_wins = player.career_wins
         #     member.career_losses = player.career_losses
-        #     if self.format == "ranked":
+        #     if se lf.format == "ranked":
         #         member.mmr = player.mmr
 
-        if self.status:
-            print("=" * 40, "\nOnline-Saving Started!")
-            for player in self.current_players:
-                if self.format == "normal":
-                    MySQL.update_normal(
-                        (f"{player.career_wins:03d}{player.career_losses:03d}", str(player.id)))
-                else:
-                    MySQL.update_ranked(
-                        (player.mmr, f"{player.career_wins:03d}{player.career_losses:03d}", str(player.id)))
-            print("Online-Saving Finished!")
-            print("=" * 40)
+        # if self.status:
+        #     print("=" * 40, "\nOnline-Saving Started!")
+        #     for player in self.current_players:
+        #         if self.format == "normal":
+        #             MySQL.update_normal(
+        #                 (player.winloss, str(player.id)))
+        #         else:
+        #             MySQL.update_ranked(
+        #                 (player.mmr, player.winloss, str(player.id)))
+        #     print("Online-Saving Finished!")
+        #     print("=" * 40)
 
         print("=" * 40, "\nOffline-Saving Started!")
         make_local_database(self)

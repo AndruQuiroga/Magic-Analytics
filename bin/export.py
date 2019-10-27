@@ -56,24 +56,24 @@ def make_local_database(mainmenu):
         #     for member in ranked_members:
         #         writer.writerow([item for item in member])
 
-    else:
-        members = mainmenu.registered_members
-
-        with open(os.path.join(path, f"local_database_{mainmenu.format}.csv"), "w") as file:
-            writer = csv.writer(file)
-
-            if mainmenu.format == "normal":
-                for member in members:
-                    writer.writerow([member.id,
-                                     member.name,
-                                     f"{member.career_wins:03d}{member.career_losses:03d}",
-                                     member.created])
-            else:
-                for member in members:
-                    writer.writerow([member.id,
-                                     member.name,
-                                     member.mmr,
-                                     f"{member.career_wins:03d}{member.career_losses:03d}",
-                                     member.created])
+    # else:
+    #     members = mainmenu.registered_members
+    #
+    #     with open(os.path.join(path, f"local_database_{mainmenu.format}.csv"), "w") as file:
+    #         writer = csv.writer(file)
+    #
+    #         if mainmenu.format == "normal":
+    #             for member in members:
+    #                 writer.writerow([member.id,
+    #                                  member.name,
+    #                                  f"{member.career_wins:03d}{member.career_losses:03d}",
+    #                                  member.created])
+    #         else:
+    #             for member in members:
+    #                 writer.writerow([member.id,
+    #                                  member.name,
+    #                                  member.mmr,
+    #                                  f"{member.career_wins:03d}{member.career_losses:03d}",
+    #                                  member.created])
 
     print("Done!")

@@ -6,7 +6,7 @@ import zipfile
 import mysql.connector
 from bin.export import *
 
-host = "overtimegaming.us.to"
+host = "73.12.65.126"
 username = "dreski"
 password = "imidnightsnack15"
 data = "magic_players"
@@ -161,7 +161,15 @@ def delete():
     print("DONE!")
 
 
+def update_manual(val):
+    sql = "UPDATE members SET name = %s WHERE id = %s"
+    my_cursor.execute(sql, val)
+    print("Player Updated")
+    database.commit()
+
+
 if __name__ == '__main__':
+    # update_manual(('Caiden F', '5890236000295966'))
     # delete()
     # first_time()
     # update_database()

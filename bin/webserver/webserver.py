@@ -4,7 +4,7 @@ import socketserver
 
 PORT = 8080
 
-web_dir = os.path.join('local')
+web_dir = os.path.join('logs')
 os.chdir(web_dir)
 Handler = http.server.SimpleHTTPRequestHandler
 
